@@ -81,10 +81,10 @@ pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
 
 pub trait DEREncodeable {
     fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
-    fn der_universal_tag(&self) -> UniversalTag;
-    fn der_content(&self) -> ContentType;
+    fn der_universal_tag() -> UniversalTag;
+    fn der_content() -> ContentType;
     fn der_encode(&self, w: &mut Write) -> io::Result<()> {
-        try!(der_encode_tag_bytes(self.der_universal_tag() as u32, Class::Universal, self.der_content(), w));
+        try!(der_encode_tag_bytes(Self::der_universal_tag() as u32, Class::Universal, Self::der_content(), w));
         let mut content = ::std::io::Cursor::new(Vec::<u8>::new());
         try!(self.der_encode_content(&mut content));
         let content = content.into_inner();
@@ -103,11 +103,11 @@ impl DEREncodeable for bool {
         Ok(())
     }
 
-    fn der_universal_tag(&self) -> UniversalTag {
+    fn der_universal_tag() -> UniversalTag {
         UniversalTag::Boolean
     }
 
-    fn der_content(&self) -> ContentType {
+    fn der_content() -> ContentType {
         ContentType::Primitive
     }
 }
@@ -118,11 +118,11 @@ impl DEREncodeable for i32 {
         Ok(())
     }
 
-    fn der_universal_tag(&self) -> UniversalTag {
+    fn der_universal_tag() -> UniversalTag {
         UniversalTag::Integer
     }
 
-    fn der_content(&self) -> ContentType {
+    fn der_content() -> ContentType {
         ContentType::Primitive
     }
 }
@@ -133,11 +133,11 @@ impl DEREncodeable for String {
         Ok(())
     }
 
-    fn der_universal_tag(&self) -> UniversalTag {
+    fn der_universal_tag() -> UniversalTag {
         UniversalTag::UTF8String
     }
 
-    fn der_content(&self) -> ContentType {
+    fn der_content() -> ContentType {
         ContentType::Primitive
     }
 }
@@ -148,11 +148,11 @@ impl<'a> DEREncodeable for &'a str {
         Ok(())
     }
 
-    fn der_universal_tag(&self) -> UniversalTag {
+    fn der_universal_tag() -> UniversalTag {
         UniversalTag::UTF8String
     }
 
-    fn der_content(&self) -> ContentType {
+    fn der_content() -> ContentType {
         ContentType::Primitive
     }
 }
@@ -165,11 +165,11 @@ impl<T: DEREncodeable> DEREncodeable for Vec<T> {
         Ok(())
     }
 
-    fn der_universal_tag(&self) -> UniversalTag {
+    fn der_universal_tag() -> UniversalTag {
         UniversalTag::Sequence
     }
 
-    fn der_content(&self) -> ContentType {
+    fn der_content() -> ContentType {
         ContentType::Constructed
     }
 }
