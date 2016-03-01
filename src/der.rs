@@ -1,4 +1,6 @@
-use std::io::Write;
+use std::io::{self, Write, Read};
+
+use byteorder::{WriteBytesExt, BigEndian};
 
 pub enum UniversalTag {
     Eoc = 0,
@@ -34,7 +36,7 @@ pub enum UniversalTag {
     BMPString = 30,
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(Clone, Copy)]
 pub enum Class {
     Universal = 0,
     Application = 1,
@@ -42,71 +44,132 @@ pub enum Class {
     Private = 3,
 }
 
+#[derive(Clone, Copy)]
 pub enum ContentType {
     Primitive = 0,
     Constructed = 1,
 }
 
-pub fn der_tag_bytes<W: Write>(tag: u32, class: Class, pc: PC, stream: &mut W) -> ::std::io::Result<()> {
-/*    let mut first_octet = ((class.clone() as u8) << 6) + ((pc as u8) << 5);
-    if (class == Class::Universal) || (tag < 0x1F) {
-        first_octet = first_octet + tag as u8;
-        try!(stream.write(&[first_octet]));
-    } else {
-        first_octet = first_octet + 0x1F;
-        try!(stream.write(&[first_octet]));
-        let mut tag = tag;
-        while tag > 0 {
-            let mut octet = ((tag & 0x7F) + 0x80) as u8;
-            tag = tag >> 7;
-            if tag <= 0 {
-                octet = octet - 0x80;
-            }
-            try!(stream.write(&[octet]));
+pub fn der_encode_tag_bytes(tag: u32, class: Class, content: ContentType, w: &mut Write) -> io::Result<()> {
+    let first_byte = (class as u8) << 6 | (content as u8) << 5 | if tag < 0x1F {tag as u8} else {0x1F};
+    try!(w.write_u8(first_byte));
+    if tag > 0x1E {
+        let mut bytes = 0;
+        let mut tag2 = tag;
+        while tag2 > 0 {bytes+=1;tag2>>=7}
+        for i in (0..bytes).rev() {
+            try!(w.write_u8(((tag >> i*7) & 0x7F) as u8 | if i != 0 {0x80} else {0x00}));
         }
     }
-    Ok(())*/
+    Ok(())
 }
 
-pub fn der_length_bytes<W: Write>(length: u32, stream: &mut W) -> ::std::io::Result<()> {
-/*    if length < 0x80 {
-        try!(stream.write(&[length as u8]));
+pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
+    if length < 0x80 {
+        try!(w.write_u8(length as u8));
     } else {
-        // Long form
-        let mut bytes = vec!();
-        let mut length = length;
-        while length > 0 {
-            bytes.push((length & 0xFF) as u8);
-            length = length >> 8;
+        let mut length_bytes = 0;
+        let mut l2 = length;
+        while l2 > 0 {length_bytes+=1;l2>>=8}
+        try!(w.write_u8(0x80 | length_bytes));
+        for i in (0..length_bytes).rev() {
+            try!(w.write_u8((length >> i*8) as u8 & 0xFF));
         }
-        bytes.reverse();
-        try!(stream.write(&[0x80+bytes.len() as u8]));
-        try!(stream.write(&bytes));
     }
-    Ok(())*/
+    Ok(())
 }
 
 pub trait DEREncodeable {
-    fn der_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()>;
-    fn der_universal_tag() -> UniversalTag;
-    fn der_content() -> ContentType;
-    //fn der_encode<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()>;
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
+    fn der_universal_tag(&self) -> UniversalTag;
+    fn der_content(&self) -> ContentType;
+    fn der_encode(&self, w: &mut Write) -> io::Result<()> {
+        try!(der_encode_tag_bytes(self.der_universal_tag() as u32, Class::Universal, self.der_content(), w));
+        let mut content = ::std::io::Cursor::new(Vec::<u8>::new());
+        try!(self.der_encode_content(&mut content));
+        let content = content.into_inner();
+        try!(der_encode_length_bytes(content.len(), w));
+        try!(w.write(&content));
+        Ok(())
+    }
 }
 
 impl DEREncodeable for bool {
-    fn der_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
         match self {
-            &true => {try!(stream.write(&[0xFF as u8]));},
-            &false => {try!(stream.write(&[0x00 as u8]));},
+            &true => try!(w.write_u8(0xFF)),
+            &false => try!(w.write_u8(0x00)),
         }
         Ok(())
     }
 
-    fn der_universal_tag() -> UniversalTag {
+    fn der_universal_tag(&self) -> UniversalTag {
         UniversalTag::Boolean
     }
 
-    fn der_content() -> ContentType {
+    fn der_content(&self) -> ContentType {
         ContentType::Primitive
+    }
+}
+
+impl DEREncodeable for i32 {
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        try!(w.write_i32::<BigEndian>(self.clone()));
+        Ok(())
+    }
+
+    fn der_universal_tag(&self) -> UniversalTag {
+        UniversalTag::Integer
+    }
+
+    fn der_content(&self) -> ContentType {
+        ContentType::Primitive
+    }
+}
+
+impl DEREncodeable for String {
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        try!(w.write(self.as_bytes()));
+        Ok(())
+    }
+
+    fn der_universal_tag(&self) -> UniversalTag {
+        UniversalTag::UTF8String
+    }
+
+    fn der_content(&self) -> ContentType {
+        ContentType::Primitive
+    }
+}
+
+impl<'a> DEREncodeable for &'a str {
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        try!(w.write(self.as_bytes()));
+        Ok(())
+    }
+
+    fn der_universal_tag(&self) -> UniversalTag {
+        UniversalTag::UTF8String
+    }
+
+    fn der_content(&self) -> ContentType {
+        ContentType::Primitive
+    }
+}
+
+impl<T: DEREncodeable> DEREncodeable for Vec<T> {
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        for item in self.iter() {
+            try!(item.der_encode(w));
+        }
+        Ok(())
+    }
+
+    fn der_universal_tag(&self) -> UniversalTag {
+        UniversalTag::Sequence
+    }
+
+    fn der_content(&self) -> ContentType {
+        ContentType::Constructed
     }
 }

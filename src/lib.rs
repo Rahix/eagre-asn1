@@ -1,3 +1,5 @@
+extern crate byteorder;
+
 #[macro_use]
 pub mod xer;
 
