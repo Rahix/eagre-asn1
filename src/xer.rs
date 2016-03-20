@@ -15,6 +15,20 @@ pub trait XEREncodeable {
     }
 }
 
+impl XEREncodeable for bool {
+    fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
+        try!(stream.write(match self {
+            &true => "True".as_bytes(),
+            &false => "False".as_bytes(),
+        }));
+        Ok(())
+    }
+
+    fn xer_name(&self) -> String {
+        "Boolean".to_string()
+    }
+}
+
 impl XEREncodeable for String {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
         try!(stream.write(self.as_bytes()));
