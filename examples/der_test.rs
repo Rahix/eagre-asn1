@@ -11,7 +11,7 @@ struct User {
 der_sequence!{
     User,
     name, String,
-    male, bool
+    male, bool,
 }
 
 fn main() {

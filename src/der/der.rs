@@ -54,6 +54,57 @@ impl DER for bool {
     }
 }
 
+impl DER for i32 {
+    fn der_universal_tag() -> UniversalTag {
+        UniversalTag::Integer
+    }
+
+    fn der_content() -> ContentType {
+        ContentType::Primitive
+    }
+
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        let mut bytes = Vec::new();
+        try!(bytes.write_i32::<BigEndian>(self.clone()));
+        let mut i = 0;
+        while true {
+            if bytes[i] == 0 && i != (bytes.len() - 1) && (bytes[i+1] == 0 || bytes[i+1] & 0x80 == 0) {
+                bytes.remove(i);
+            } else if bytes[i] == 0xff && i != (bytes.len() - 1) && (bytes[i+1] == 0xff || bytes[i+1] & 0x80 == 0x80) {
+                bytes.remove(i);
+            } else {
+                break;
+            }
+        }
+        try!(w.write(&bytes));
+        Ok(())
+    }
+
+    #[allow(overflowing_literals)]
+    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+        let mut encoded = r.take(length as u64);
+        let mut buffer = Vec::new();
+        try!(encoded.read_to_end(&mut buffer));
+        let mut value = 0;
+        let mut i = buffer.len();
+        let fb = buffer[0];
+        if fb & 0x80 == 0x80 {
+            value = 0xffffffff;
+        }
+        for mut byte in buffer {
+            i -= 1;
+            if fb & 0x80 == 0x80 {
+                value = value & !(0xff << i*8);
+            }
+            value = value | (byte as i32) << i * 8;
+        }
+        if fb & 0x80 == 0x80 {
+            value = -(!value + 1);
+        }
+        Ok(value)
+    }
+}
+
 impl DER for String {
     fn der_universal_tag() -> UniversalTag {
         UniversalTag::UTF8String

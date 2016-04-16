@@ -30,5 +30,8 @@ macro_rules! der_sequence {
                 })
             }
         }
-    }
+    };
+    ($struct_name:ident, $($field_name:ident , $field_type:ty),+,) => {
+        der_sequence!($struct_name, $($field_name, $field_type),+);
+    };
 }

@@ -69,6 +69,16 @@ fn serialize_bool() {
 }
 
 #[test]
+fn serialize_i32() {
+    for i in -65535..65535 {
+        let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
+        i.der_encode(&mut stream).unwrap();
+        stream.set_position(0);
+        assert_eq!(i, i32::der_decode(&mut stream).unwrap());
+    }
+}
+
+#[test]
 fn serialize_string() {
     let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
     "ThisIsATestWithUtf8: ∅ ".to_string().der_encode(&mut stream).unwrap();
