@@ -174,3 +174,24 @@ impl<T: DER> DER for Vec<T> {
         Ok(vector)
     }
 }
+
+impl DER for Vec<u8> {
+    fn der_universal_tag() -> UniversalTag {
+        UniversalTag::OctetString
+    }
+
+    fn der_content() -> ContentType {
+        ContentType::Primitive
+    }
+
+    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+        try!(w.write(self));
+        Ok(())
+    }
+
+    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+        let mut buffer = Vec::new();
+        try!(r.take(length as u64).read_to_end(&mut buffer));
+        Ok(buffer)
+    }
+}

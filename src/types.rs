@@ -41,3 +41,5 @@ string_convert!(CharacterString);
 
 pub struct UTCTime;
 pub struct GeneralizedTime;
+
+pub struct Null;

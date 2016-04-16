@@ -97,3 +97,14 @@ fn serialize_sequence_of() {
         assert_eq!(vec.get(i).unwrap().to_string(), ret.get(i).unwrap().clone());
     }
 }
+
+fn serialize_octet_string() {
+    let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
+    let vec = vec!(1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8);
+    vec.der_encode(&mut stream).unwrap();
+    stream.set_position(0);
+    let ret = Vec::<String>::der_decode(&mut stream).unwrap();
+    for i in 0..vec.len() {
+        assert_eq!(vec.get(i).unwrap().to_string(), ret.get(i).unwrap().clone());
+    }
+}
