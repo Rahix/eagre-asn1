@@ -18,8 +18,7 @@ macro_rules! der_sequence {
                 Ok(())
             }
 
-            fn der_decode_content(r: &mut ::std::io::Read, length: usize) -> ::std::io::Result<Self> {
-                use $crate::der::DER;
+            fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
                 $(
                     let $field_name : $field_type = try!($crate::der::DER::der_decode(r));
                 )+

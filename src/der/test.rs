@@ -1,11 +1,10 @@
-#[macro_use]
 use super::*;
 
 #[test]
 fn decode_tag_bytes() {
     for i in 0..32000 {
         let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
-        der_encode_tag_bytes(i, Class::Private, ContentType::Constructed, &mut stream);
+        der_encode_tag_bytes(i, Class::Private, ContentType::Constructed, &mut stream).unwrap();
         stream.set_position(0);
         let (_, tg, _, _) = der_decode_tag_bytes(&mut stream).unwrap();
         assert_eq!(tg, i);
@@ -98,13 +97,14 @@ fn serialize_sequence_of() {
     }
 }
 
+#[test]
 fn serialize_octet_string() {
     let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
     let vec = vec!(1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8);
     vec.der_encode(&mut stream).unwrap();
     stream.set_position(0);
-    let ret = Vec::<String>::der_decode(&mut stream).unwrap();
+    let ret = Vec::<u8>::der_decode(&mut stream).unwrap();
     for i in 0..vec.len() {
-        assert_eq!(vec.get(i).unwrap().to_string(), ret.get(i).unwrap().clone());
+        assert_eq!(vec.get(i).unwrap().clone(), ret.get(i).unwrap().clone());
     }
 }

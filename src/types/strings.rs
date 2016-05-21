@@ -1,0 +1,10 @@
+pub struct NumericString(String);
+pub struct PrintableString(String);
+pub struct T61String(String);
+pub struct VideotexString(String);
+pub struct IA5String(String);
+pub struct GraphicString(String);
+pub struct VisibleString(String);
+pub struct GeneralString(String);
+pub struct UniversalString(String);
+pub struct CharacterString(String);

@@ -24,7 +24,7 @@ fn main() {
     };
 
     data.der_encode(&mut stream).unwrap();
-    data.der_encode(&mut file);
+    data.der_encode(&mut file).unwrap();
     stream.set_position(0);
     let new_data = User::der_decode(&mut stream).unwrap();
     println!("{:?}", new_data);

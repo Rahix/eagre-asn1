@@ -24,6 +24,11 @@ pub trait DER : Sized {
         let (_, length) = try!(der_decode_length_bytes(r));
         Ok(try!(Self::der_decode_content(r, length)))
     }
+    fn der_bytes(&self) -> io::Result<Vec<u8>> {
+        let mut stream = Vec::new();
+        try!(self.der_encode(&mut stream));
+        Ok(stream)
+    }
 }
 
 impl DER for bool {
@@ -66,8 +71,8 @@ impl DER for i32 {
     fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
         let mut bytes = Vec::new();
         try!(bytes.write_i32::<BigEndian>(self.clone()));
-        let mut i = 0;
-        while true {
+        let i = 0;
+        loop {
             if bytes[i] == 0 && i != (bytes.len() - 1) && (bytes[i+1] == 0 || bytes[i+1] & 0x80 == 0) {
                 bytes.remove(i);
             } else if bytes[i] == 0xff && i != (bytes.len() - 1) && (bytes[i+1] == 0xff || bytes[i+1] & 0x80 == 0x80) {
@@ -91,7 +96,7 @@ impl DER for i32 {
         if fb & 0x80 == 0x80 {
             value = 0xffffffff;
         }
-        for mut byte in buffer {
+        for byte in buffer {
             i -= 1;
             if fb & 0x80 == 0x80 {
                 value = value & !(0xff << i*8);
