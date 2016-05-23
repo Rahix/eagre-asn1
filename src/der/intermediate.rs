@@ -40,7 +40,7 @@ impl Intermediate {
         let (_, length) = try!(der_decode_length_bytes(r));
         let mut enc = r.take(length as u64);
         let mut buf = vec!();
-        try!(enc.read(&mut buf));
+        try!(enc.read_to_end(&mut buf));
         Ok(Intermediate {
             class: class,
             content_type: content_type,

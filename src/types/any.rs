@@ -1,6 +1,5 @@
 use std::io::{self, Write, Read};
 use der::*;
-use Peek;
 
 pub struct Any(Vec<u8>);
 

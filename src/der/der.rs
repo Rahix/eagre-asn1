@@ -8,32 +8,33 @@ pub trait DER : Sized {
     fn der_content() -> ContentType;
     fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
     fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self>;
-    fn der_intermediate(&self) -> Intermediate {
+    fn der_intermediate(&self) -> io::Result<Intermediate> {
         let mut buf = vec!();
-        self.der_encode_content(&mut buf);
-        Intermediate::new(Class::Universal, Self::der_content(), Self::der_universal_tag() as u32)
-            .with_content(buf)
+        try!(self.der_encode_content(&mut buf));
+        Ok(Intermediate::new(Class::Universal, Self::der_content(), Self::der_universal_tag() as u32)
+            .with_content(buf))
     }
     fn der_encode(&self, w: &mut Write) -> io::Result<()> {
-        try!(der_encode_tag_bytes(Self::der_universal_tag() as u32, Class::Universal, Self::der_content(), w));
-        let mut content = Vec::<u8>::new();
-        try!(self.der_encode_content(&mut content));
-        try!(der_encode_length_bytes(content.len(), w));
-        try!(w.write(&content));
+        try!(try!(self.der_intermediate()).encode(w));
         Ok(())
-    }
-    fn der_decode(r: &mut Read) -> io::Result<Self> {
-        let (_, tag, class, _) = try!(der_decode_tag_bytes(r));
-        if (class == Class::Universal) && (tag != Self::der_universal_tag() as u32) {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "trying to decode other type"));
-        }
-        let (_, length) = try!(der_decode_length_bytes(r));
-        Ok(try!(Self::der_decode_content(r, length)))
     }
     fn der_bytes(&self) -> io::Result<Vec<u8>> {
         let mut stream = Vec::new();
         try!(self.der_encode(&mut stream));
         Ok(stream)
+    }
+    fn der_from_intermediate(i: Intermediate) -> io::Result<Self> {
+        let length = i.content.len();
+        let mut stream = io::Cursor::new(i.content);
+        Self::der_decode_content(&mut stream, length)
+    }
+    fn der_decode(r: &mut Read) -> io::Result<Self> {
+        let i = try!(Intermediate::decode(r));
+        Self::der_from_intermediate(i)
+    }
+    fn der_from_bytes(bytes: Vec<u8>) -> io::Result<Self> {
+        let mut stream = io::Cursor::new(bytes);
+        Self::der_decode(&mut stream)
     }
 }
 
