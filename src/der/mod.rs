@@ -1,5 +1,7 @@
 pub mod tag;
 pub mod length;
+pub mod intermediate;
+
 #[cfg(test)]
 mod test;
 
@@ -9,6 +11,7 @@ pub mod macros;
 
 pub use self::tag::*;
 pub use self::length::*;
+pub use self::intermediate::Intermediate;
 pub use self::der::DER;
 
 #[derive(Debug)]

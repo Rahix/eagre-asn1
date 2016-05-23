@@ -1,5 +1,7 @@
 use super::*;
 
+include!("macros.rs");
+
 #[test]
 fn decode_tag_bytes() {
     for i in 0..32000 {
@@ -108,3 +110,51 @@ fn serialize_octet_string() {
         assert_eq!(vec.get(i).unwrap().clone(), ret.get(i).unwrap().clone());
     }
 }
+
+#[derive(Debug, PartialEq)]
+struct TestStruct {
+    pub alpha: i32,
+    pub beta: bool,
+    pub gamma: String,
+}
+
+der_sequence!(TestStruct, alpha, i32, beta, bool, gamma, String);
+
+#[test]
+fn serialize_sequence() {
+    let data = TestStruct {
+        alpha: 65535,
+        beta: false,
+        gamma: "Hello World".to_string(),
+    };
+    let mut stream = ::std::io::Cursor::new(data.der_bytes().unwrap());
+    assert_eq!(data, TestStruct::der_decode(&mut stream).unwrap());
+}
+
+#[derive(Debug, PartialEq)]
+enum TestEnum {
+    Alpha,
+    Beta,
+    Gamma,
+}
+
+der_enumerated!(TestEnum, Alpha, 5, Beta, 1222, Gamma, 42);
+
+#[test]
+fn serialize_enumerated() {
+    for val in vec!(TestEnum::Alpha, TestEnum::Beta, TestEnum::Gamma) {
+        let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
+        val.der_encode(&mut stream).unwrap();
+        stream.set_position(0);
+        assert_eq!(val, TestEnum::der_decode(&mut stream).unwrap());
+    }
+}
+
+#[derive(Debug, PartialEq)]
+enum TestChoice {
+    Alpha(i32),
+    Beta(String),
+    Gamma(bool),
+}
+
+//der_choice!(TestChoice, Alpha, i32, Beta, String, Gamma, bool);

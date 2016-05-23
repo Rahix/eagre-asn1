@@ -8,6 +8,10 @@ pub mod der;
 
 pub mod types;
 
+pub mod peek;
+
+pub use peek::Peek;
+
 #[macro_export]
 macro_rules! debug_xer {
     ($struct_name:ident) => {

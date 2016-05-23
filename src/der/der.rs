@@ -8,6 +8,12 @@ pub trait DER : Sized {
     fn der_content() -> ContentType;
     fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
     fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self>;
+    fn der_intermediate(&self) -> Intermediate {
+        let mut buf = vec!();
+        self.der_encode_content(&mut buf);
+        Intermediate::new(Class::Universal, Self::der_content(), Self::der_universal_tag() as u32)
+            .with_content(buf)
+    }
     fn der_encode(&self, w: &mut Write) -> io::Result<()> {
         try!(der_encode_tag_bytes(Self::der_universal_tag() as u32, Class::Universal, Self::der_content(), w));
         let mut content = Vec::<u8>::new();
