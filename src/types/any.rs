@@ -12,15 +12,7 @@ impl DER for Any {
         unimplemented!()
     }
 
-    fn der_encode(&self, _: &mut Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
     fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
-    fn der_decode(_: &mut Read) -> io::Result<Self> {
         unimplemented!()
     }
 
