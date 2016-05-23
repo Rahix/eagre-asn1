@@ -150,11 +150,11 @@ fn serialize_enumerated() {
     }
 }
 
-#[derive(Debug, PartialEq)]
+/*#[derive(Debug, PartialEq)]
 enum TestChoice {
     Alpha(i32),
     Beta(String),
     Gamma(bool),
-}
+}*/
 
 //der_choice!(TestChoice, Alpha, i32, Beta, String, Gamma, bool);

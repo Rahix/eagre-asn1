@@ -49,7 +49,6 @@ macro_rules! der_enumerated {
 
             fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
                 use $crate::der::DER;
-                use std::convert::Into;
                 try!(match self {
                     $(&$enum_name::$enum_variant => $enum_discr,)+
                 }.der_encode(w));

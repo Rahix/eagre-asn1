@@ -1,4 +1,4 @@
-use std::io::{self, Write, Read};
+use std::io::{self, Read};
 
 pub struct Peek<T> {
     inner: T,
