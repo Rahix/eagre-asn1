@@ -9,9 +9,9 @@ struct User {
 }
 
 der_sequence!{
-    User,
-    name, String,
-    male, bool,
+    User:
+    name: String,
+    male: bool,
 }
 
 fn main() {

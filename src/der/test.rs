@@ -102,13 +102,11 @@ struct TestStruct {
     pub gamma: String,
 }
 
-der_sequence!(TestStruct, alpha, i32, beta, bool, gamma, String);
-/*der_sequence!{ // What the future could look like
-    TestStruct, //TODO: Implement!
-        alpha: [ EXPLICIT APPLICATION 8 ] EXPLICIT i32,
-        beta:  [ IMPLICIT CONTEXT 12 ] IMPLICIT bool,
-        gamma: [ EXPLICIT UNIVERSAL 199 ] EXPLICIT String,
-}*/
+der_sequence!{TestStruct:
+    alpha: i32,
+    beta: bool,
+    gamma: String,
+}
 
 #[test]
 fn serialize_sequence() {
