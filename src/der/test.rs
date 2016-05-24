@@ -59,41 +59,28 @@ fn decode_length() {
 
 #[test]
 fn serialize_bool() {
-    let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
-    true.der_encode(&mut stream).unwrap();
-    stream.set_position(0);
-    assert_eq!(true, bool::der_decode(&mut stream).unwrap());
-    stream = ::std::io::Cursor::new(Vec::<u8>::new());
-    false.der_encode(&mut stream).unwrap();
-    stream.set_position(0);
-    assert_eq!(false, bool::der_decode(&mut stream).unwrap());
+    assert_eq!(true, bool::der_from_bytes(true.der_bytes().unwrap()).unwrap());
+    assert_eq!(false, bool::der_from_bytes(false.der_bytes().unwrap()).unwrap());
 }
 
 #[test]
 fn serialize_i32() {
     for i in -65535..65535 {
-        let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
-        i.der_encode(&mut stream).unwrap();
-        stream.set_position(0);
-        assert_eq!(i, i32::der_decode(&mut stream).unwrap());
+        assert_eq!(i, i32::der_from_bytes(i.der_bytes().unwrap()).unwrap());
     }
 }
 
 #[test]
 fn serialize_string() {
-    let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
-    "ThisIsATestWithUtf8: ∅ ".to_string().der_encode(&mut stream).unwrap();
-    stream.set_position(0);
-    assert_eq!("ThisIsATestWithUtf8: ∅ ".to_string(), String::der_decode(&mut stream).unwrap());
+    assert_eq!("ThisIsATestWithUtf8: ∅ ".to_string(), 
+               String::der_from_bytes(
+                   "ThisIsATestWithUtf8: ∅ ".to_string().der_bytes().unwrap()).unwrap());
 }
 
 #[test]
 fn serialize_sequence_of() {
-    let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
     let vec = vec!("I", "am", "the", "master!");
-    vec.der_encode(&mut stream).unwrap();
-    stream.set_position(0);
-    let ret = Vec::<String>::der_decode(&mut stream).unwrap();
+    let ret = Vec::<String>::der_from_bytes(vec.der_bytes().unwrap()).unwrap();
     for i in 0..vec.len() {
         assert_eq!(vec.get(i).unwrap().to_string(), ret.get(i).unwrap().clone());
     }
@@ -101,11 +88,8 @@ fn serialize_sequence_of() {
 
 #[test]
 fn serialize_octet_string() {
-    let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
     let vec = vec!(1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8);
-    vec.der_encode(&mut stream).unwrap();
-    stream.set_position(0);
-    let ret = Vec::<u8>::der_decode(&mut stream).unwrap();
+    let ret = Vec::<u8>::der_from_bytes(vec.der_bytes().unwrap()).unwrap();
     for i in 0..vec.len() {
         assert_eq!(vec.get(i).unwrap().clone(), ret.get(i).unwrap().clone());
     }
@@ -119,6 +103,12 @@ struct TestStruct {
 }
 
 der_sequence!(TestStruct, alpha, i32, beta, bool, gamma, String);
+/*der_sequence!{ // What the future could look like
+    TestStruct, //TODO: Implement!
+        alpha: [ EXPLICIT APPLICATION 8 ] EXPLICIT i32,
+        beta:  [ IMPLICIT CONTEXT 12 ] IMPLICIT bool,
+        gamma: [ EXPLICIT UNIVERSAL 199 ] EXPLICIT String,
+}*/
 
 #[test]
 fn serialize_sequence() {
@@ -127,8 +117,7 @@ fn serialize_sequence() {
         beta: false,
         gamma: "Hello World".to_string(),
     };
-    let mut stream = ::std::io::Cursor::new(data.der_bytes().unwrap());
-    assert_eq!(data, TestStruct::der_decode(&mut stream).unwrap());
+    assert_eq!(data, TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap());
 }
 
 #[derive(Debug, PartialEq)]
@@ -143,10 +132,7 @@ der_enumerated!(TestEnum, Alpha, 5, Beta, 1222, Gamma, 42);
 #[test]
 fn serialize_enumerated() {
     for val in vec!(TestEnum::Alpha, TestEnum::Beta, TestEnum::Gamma) {
-        let mut stream = ::std::io::Cursor::new(Vec::<u8>::new());
-        val.der_encode(&mut stream).unwrap();
-        stream.set_position(0);
-        assert_eq!(val, TestEnum::der_decode(&mut stream).unwrap());
+        assert_eq!(val, TestEnum::der_from_bytes(val.der_bytes().unwrap()).unwrap());
     }
 }
 

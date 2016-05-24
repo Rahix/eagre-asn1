@@ -1,15 +1,19 @@
 use std::io::{self, Write, Read};
 use der::*;
 
-pub struct Any(Vec<u8>);
+pub struct Any {
+    class: Class,
+    content_type: ContentType,
+    tag: u32,
+}
 
 impl DER for Any {
     fn der_universal_tag() -> UniversalTag {
-        unimplemented!()
+        unimplemented!() // Any is a hidden type and does not have a Universal Tag
     }
 
     fn der_content() -> ContentType {
-        unimplemented!()
+        unimplemented!() // Same as universal tag
     }
 
     fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
@@ -20,13 +24,3 @@ impl DER for Any {
         unimplemented!()
     }
 }
-
-/*#[test]
-fn serialize_any() {
-    let buf = 42.der_bytes().unwrap();
-    let any = Any(buf);
-    let mut stream = io::Cursor::new(any.der_bytes().unwrap());
-    let Any(vec) = Any::der_decode(&mut stream).unwrap();
-    let value = i32::der_decode(&mut io::Cursor::new(vec)).unwrap();
-    assert_eq!(value, 42);
-}*/
