@@ -65,8 +65,16 @@ fn serialize_bool() {
 
 #[test]
 fn serialize_i32() {
-    for i in -65535..65535 {
+    for i in vec!(::std::i32::MAX, 65535, 8, 1, 0, -1, -8, -65535, -::std::i32::MAX) {
         assert_eq!(i, i32::der_from_bytes(i.der_bytes().unwrap()).unwrap());
+    }
+}
+
+#[test]
+fn i32_no_panic_but_err() {
+    let data = vec!(0x02, 0x07, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF); // Very big integer
+    if let Ok(_) = i32::der_from_bytes(data) {
+        panic!("Decoded too big Integer");
     }
 }
 
@@ -103,19 +111,23 @@ struct TestStruct {
 }
 
 der_sequence!{TestStruct:
-    alpha: i32,
-    beta: bool,
-    gamma: String,
+    alpha: NOTAG TYPE i32,
+    beta: EXPLICIT TAG CONTEXT 42; TYPE bool,
+    gamma: IMPLICIT TAG APPLICATION 397; TYPE String
 }
 
 #[test]
 fn serialize_sequence() {
+    //use std::io::Write;
+    //use std::fs::File;
     let data = TestStruct {
         alpha: 65535,
         beta: false,
         gamma: "Hello World".to_string(),
     };
     assert_eq!(data, TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap());
+    //let mut f = File::create("test.ber").unwrap();
+    //f.write_all(&data.der_bytes().unwrap()).unwrap();
 }
 
 #[derive(Debug, PartialEq)]

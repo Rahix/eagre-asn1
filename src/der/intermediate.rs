@@ -2,6 +2,7 @@ use std::io::{self, Write, Read};
 
 use super::*;
 
+#[derive(Clone)]
 pub struct Intermediate {
     pub class: Class,
     pub content_type: ContentType,
@@ -45,6 +46,13 @@ impl Intermediate {
         Ok(())
     }
 
+    pub fn encode_implicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
+        try!(der_encode_tag_bytes(tag, class, self.content_type, w));
+        try!(der_encode_length_bytes(self.content.len(), w));
+        try!(w.write(&self.content));
+        Ok(())
+    }
+
     pub fn decode(r: &mut Read) -> io::Result<Intermediate> {
         let (_, tag, class, content_type) = try!(der_decode_tag_bytes(r));
         let (_, length) = try!(der_decode_length_bytes(r));
@@ -61,8 +69,22 @@ impl Intermediate {
 
     pub fn decode_explicit(r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
         let (_, tag, class, _) = try!(der_decode_tag_bytes(r));
-        let (_, length) = try!(der_decode_length_bytes(r));
+        let (_, _) = try!(der_decode_length_bytes(r));
         Ok((tag, class, try!(Intermediate::decode(r))))
+    }
+
+    pub fn decode_implicit(tag: u32, class: Class, r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
+        let (_, tag_impl, class_impl, content_type) = try!(der_decode_tag_bytes(r));
+        let (_, length) = try!(der_decode_length_bytes(r));
+        let mut enc = r.take(length as u64);
+        let mut buf = vec!();
+        try!(enc.read_to_end(&mut buf));
+        Ok((tag_impl, class_impl, Intermediate {
+            class: class,
+            content_type: content_type,
+            tag: tag,
+            content: buf,
+        }))
     }
 }
 
@@ -70,7 +92,7 @@ impl Intermediate {
 fn test_explicit_tagging() {
     let i = 1234.der_intermediate().unwrap();
     let mut data = io::Cursor::new(vec!());
-    i.encode_explicit(42, Class::Private, &mut data);
+    i.encode_explicit(42, Class::Private, &mut data).unwrap();
     data.set_position(0);
     let (tag, class, intermediate) = Intermediate::decode_explicit(&mut data).unwrap();
     assert_eq!(tag, 42);

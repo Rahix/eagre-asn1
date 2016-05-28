@@ -10,8 +10,8 @@ struct User {
 
 der_sequence!{
     User:
-    name: String,
-    male: bool,
+    name: NOTAG TYPE String,
+    male: NOTAG TYPE bool,
 }
 
 fn main() {

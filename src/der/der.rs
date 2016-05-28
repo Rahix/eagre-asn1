@@ -105,9 +105,14 @@ impl DER for i32 {
         }
         for byte in buffer {
             i -= 1;
-            if fb & 0x80 == 0x80 {
-                value = value & !(0xff << i*8);
+            if i > 3 { // i32 can only handle 4 bytes
+                return Err(io::Error::new(io::ErrorKind::InvalidInput, "Trying to decode too big integer"));
             }
+            if fb & 0x80 == 0x80 {
+                value = value & !(0xff << i * 8);
+            }
+//          |                                     |
+//          V TODO: Something is not working here V
             value = value | (byte as i32) << i * 8;
         }
         if fb & 0x80 == 0x80 {
