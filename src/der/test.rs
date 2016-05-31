@@ -113,7 +113,7 @@ struct TestStruct {
 der_sequence!{TestStruct:
     alpha: NOTAG TYPE i32,
     beta: EXPLICIT TAG CONTEXT 42; TYPE bool,
-    gamma: IMPLICIT TAG APPLICATION 397; TYPE String
+    gamma: IMPLICIT TAG APPLICATION 397; TYPE String,
 }
 
 #[test]
@@ -130,14 +130,14 @@ fn serialize_sequence() {
     //f.write_all(&data.der_bytes().unwrap()).unwrap();
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum TestEnum {
-    Alpha,
-    Beta,
-    Gamma,
+    Alpha = 1,
+    Beta = 1024,
+    Gamma = 42,
 }
 
-der_enumerated!(TestEnum, Alpha, 5, Beta, 1222, Gamma, 42);
+der_enumerated!(TestEnum, Alpha, Beta, Gamma);
 
 #[test]
 fn serialize_enumerated() {
@@ -146,11 +146,22 @@ fn serialize_enumerated() {
     }
 }
 
-/*#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 enum TestChoice {
     Alpha(i32),
-    Beta(String),
-    Gamma(bool),
-}*/
+    Beta(bool),
+    Gamma(String),
+}
 
-//der_choice!(TestChoice, Alpha, i32, Beta, String, Gamma, bool);
+der_choice!{TestChoice:
+    Alpha: NOTAG TYPE i32,
+    Beta: EXPLICIT TAG CONTEXT 42; TYPE bool,
+    Gamma: IMPLICIT TAG APPLICATION 397; TYPE String,
+}
+
+#[test]
+fn serialize_choice() {
+    for val in vec!(TestChoice::Alpha(1024), TestChoice::Beta(false), TestChoice::Gamma("Hello World".to_string())) {
+        assert_eq!(val, TestChoice::der_from_bytes(val.der_bytes().unwrap()).unwrap());
+    }
+}

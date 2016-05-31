@@ -16,36 +16,67 @@ pub use self::der::DER;
 
 #[derive(Debug)]
 pub enum UniversalTag {
-    Eoc = 0,
+    /// End of Content
+    EOC = 0,
+    /// Boolean
     Boolean = 1,
+    /// Integer
     Integer = 2,
+    /// BitString
     BitString = 3,
+    /// OctetString
     OctetString = 4,
+    /// Null
     Null = 5,
+    /// ObjectIdentifier
     ObjectIdentifier = 6,
+    /// ObjectDescriptor
     ObjectDescriptor = 7,
+    /// External
     External = 8,
+    /// Real
     Real = 9,
+    /// Enumerated
     Enumerated = 10,
+    /// EmbeddedPDV
     EmbeddedPDV = 11,
+    /// UTF8String
     UTF8String = 12,
+    /// RelativeOID
     RelativeOID = 13,
-    // Reserved = 14,
-    // Reserved = 15,
+    /// Reserved, Unused
+    Reserved01 = 14,
+    /// Reserved, Unused
+    Reserved02 = 15,
+    /// Sequence
     Sequence = 16,
+    /// Set
     Set = 17,
+    /// NumericString
     NumericString = 18,
+    /// PrintableString
     PrintableString = 19,
+    /// T61String
     T61String = 20,
+    /// VideotexString
     VideotexString = 21,
+    /// IA5String
     IA5String = 22,
+    /// UTCTime
     UTCTime = 23,
+    /// GeneralizedTime
     GeneralizedTime = 24,
+    /// GraphicString
     GraphicString = 25,
+    /// VisibleString
     VisibleString = 26,
+    /// GeneralString
     GeneralString = 27,
+    /// UniversalString
     UniversalString = 28,
+    /// CharacterString
     CharacterString = 29,
+    /// BMPString
     BMPString = 30,
 }
 

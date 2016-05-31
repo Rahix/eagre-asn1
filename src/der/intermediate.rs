@@ -2,15 +2,23 @@ use std::io::{self, Write, Read};
 
 use super::*;
 
-#[derive(Clone)]
+/// Intermediate Type
+///
+/// Intermediate type necessary for tagging, etc.
+#[derive(Clone, Debug)]
 pub struct Intermediate {
+    /// Class of this encoded object
     pub class: Class,
+    /// Content Type of this encoded object
     pub content_type: ContentType,
+    /// Tag of this encoded object
     pub tag: u32,
+    /// Content octets
     pub content: Vec<u8>,
 }
 
 impl Intermediate {
+    /// Create new Intermediate with empty content octets
     pub fn new(class: Class, ct: ContentType, tag: u32) -> Intermediate {
         Intermediate {
             class: class,
@@ -20,15 +28,25 @@ impl Intermediate {
         }
     }
 
+    /// Add a content like using a builder
+    ///
+    /// ```
+    /// # use eagre_asn1::der::*;
+    /// let i = Intermediate::new(Class::Application,
+    ///                           ContentType::Primitive,
+    ///                           2).with_content(vec!(0x00));
+    /// ```
     pub fn with_content(mut self, content: Vec<u8>) -> Intermediate {
         self.content = content;
         self
     }
 
+    /// Set content octets
     pub fn set_content(&mut self, content: Vec<u8>) {
         self.content = content;
     }
 
+    /// Encode this Intermediate
     pub fn encode(&self, w: &mut Write) -> io::Result<()> {
         try!(der_encode_tag_bytes(self.tag, self.class, self.content_type, w));
         try!(der_encode_length_bytes(self.content.len(), w));
@@ -36,6 +54,7 @@ impl Intermediate {
         Ok(())
     }
 
+    /// Encode this Intermediate using explicit tagging
     pub fn encode_explicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
         try!(der_encode_tag_bytes(tag, class, ContentType::Constructed, w));
         let mut stream = io::Cursor::new(vec!());
@@ -46,6 +65,7 @@ impl Intermediate {
         Ok(())
     }
 
+    /// Encode this Intermediate using implicit tagging
     pub fn encode_implicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
         try!(der_encode_tag_bytes(tag, class, self.content_type, w));
         try!(der_encode_length_bytes(self.content.len(), w));
@@ -53,6 +73,7 @@ impl Intermediate {
         Ok(())
     }
 
+    /// Decode an Intermediate
     pub fn decode(r: &mut Read) -> io::Result<Intermediate> {
         let (_, tag, class, content_type) = try!(der_decode_tag_bytes(r));
         let (_, length) = try!(der_decode_length_bytes(r));
@@ -67,12 +88,14 @@ impl Intermediate {
         })
     }
 
+    /// Decode an Intermediate using explicit tagging
     pub fn decode_explicit(r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
         let (_, tag, class, _) = try!(der_decode_tag_bytes(r));
         let (_, _) = try!(der_decode_length_bytes(r));
         Ok((tag, class, try!(Intermediate::decode(r))))
     }
 
+    /// Decode an Intermediate using implicit tagging
     pub fn decode_implicit(tag: u32, class: Class, r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
         let (_, tag_impl, class_impl, content_type) = try!(der_decode_tag_bytes(r));
         let (_, length) = try!(der_decode_length_bytes(r));

@@ -1,17 +1,36 @@
 use std::io::{self, Write, Read};
 use der::*;
 
+/// The Asn1 Any Type
+///
+/// Any encoded "Any" type will not be visible in the encoded bytes.
+/// It is a helper type, which should be used in case the actual type is not known yet.
+///
+/// # Example
+///
+/// ```
+/// # use eagre_asn1::types::*;
+/// # use eagre_asn1::der::DER;
+///
+/// let any = Any::new("I am a random string".to_string()).unwrap();
+/// let encoded = any.der_bytes().unwrap();
+/// // Send to far away planet
+/// let decoded = Any::der_from_bytes(encoded).unwrap();
+/// assert_eq!("I am a random string", &decoded.resolve::<String>().unwrap());
+/// ```
 pub struct Any {
     i: Intermediate,
 }
 
 impl Any {
+    /// Create a new Any object from a inner value
     pub fn new<T: DER>(val: T) -> io::Result<Any> {
         Ok(Any {
             i: try!(val.der_intermediate()),
         })
     }
 
+    /// Resolve the inner value of an Any object
     pub fn resolve<T: DER>(&self) -> io::Result<T> {
         <T>::der_from_intermediate(self.i.clone())
     }

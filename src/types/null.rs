@@ -1,6 +1,8 @@
 use std::io::{self, Write, Read};
 use der::*;
 
+/// The Asn1 Null Type
+#[derive(Clone, Debug, PartialEq)]
 pub struct Null;
 
 impl DER for Null {

@@ -3,41 +3,87 @@ use byteorder::{WriteBytesExt, BigEndian, ReadBytesExt};
 
 use super::*;
 
+/// The base trait for DER
+///
+/// Every type implementing this trait may be serialized
+///
+/// Note that only `der_intermediate()` and `der_from_intermediate()` need a meaningful
+/// implementation. `der_encode_content()`, `der_decode_content()`, `der_universal_tag()` and
+/// `der_content()` are only used in the standard implementation of the intermediate functions.
+///
+/// # Example Implementation #
+/// ```
+/// # use eagre_asn1::der::*;
+/// # use std::io::{self, Read, Write};
+///
+/// # struct Null;
+/// impl DER for Null {
+///    fn der_universal_tag() -> UniversalTag {
+///        UniversalTag::Null
+///    }
+///
+///    fn der_content() -> ContentType {
+///        ContentType::Primitive
+///    }
+///
+///    fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
+///        Ok(())
+///    }
+///
+///    fn der_decode_content(_: &mut Read, length: usize) -> io::Result<Self> {
+///        if length != 0 {
+///            return Err(io::Error::new(io::ErrorKind::InvalidInput, "Null Type with size bigger than zero"));
+///        }
+///        Ok(Null)
+///    }
+/// }
+/// ```
 pub trait DER : Sized {
+    /// Return universal tag of this type
     fn der_universal_tag() -> UniversalTag;
+    /// Return content type of this type
     fn der_content() -> ContentType;
+    /// Encode the content octets
     fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
+    /// Decode the content octets
     fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self>;
+    /// Create Intermediate from this object
     fn der_intermediate(&self) -> io::Result<Intermediate> {
         let mut buf = vec!();
         try!(self.der_encode_content(&mut buf));
         Ok(Intermediate::new(Class::Universal, Self::der_content(), Self::der_universal_tag() as u32)
             .with_content(buf))
     }
+    /// Fully encode into stream ( tag bytes + length bytes + content bytes )
     fn der_encode(&self, w: &mut Write) -> io::Result<()> {
         try!(try!(self.der_intermediate()).encode(w));
         Ok(())
     }
+    /// Return fully encoded bytes (wrapper for der_encode() for easier use)
     fn der_bytes(&self) -> io::Result<Vec<u8>> {
         let mut stream = Vec::new();
         try!(self.der_encode(&mut stream));
         Ok(stream)
     }
+    /// Create object from Intermediate
     fn der_from_intermediate(i: Intermediate) -> io::Result<Self> {
         let length = i.content.len();
         let mut stream = io::Cursor::new(i.content);
         Self::der_decode_content(&mut stream, length)
     }
+    /// Create object from stream
     fn der_decode(r: &mut Read) -> io::Result<Self> {
         let i = try!(Intermediate::decode(r));
         Self::der_from_intermediate(i)
     }
+    /// Create object from bytes
     fn der_from_bytes(bytes: Vec<u8>) -> io::Result<Self> {
         let mut stream = io::Cursor::new(bytes);
         Self::der_decode(&mut stream)
     }
 }
 
+/// FooBar Cool
 impl DER for bool {
     fn der_universal_tag() -> UniversalTag {
         UniversalTag::Boolean

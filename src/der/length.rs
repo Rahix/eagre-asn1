@@ -1,6 +1,7 @@
 use std::io::{self, Write, Read};
 use byteorder::{WriteBytesExt, ReadBytesExt};
 
+/// Encode DER length bytes
 pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
     if length < 0x80 {
         try!(w.write_u8(length as u8));
@@ -16,6 +17,7 @@ pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
     Ok(())
 }
 
+/// Decode DER length bytes
 pub fn der_decode_length_bytes(r: &mut Read) -> io::Result<(usize, usize)> {
     let first_byte = try!(r.read_u8());
     let mut bytes_read = 1;

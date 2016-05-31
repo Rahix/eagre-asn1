@@ -2,6 +2,7 @@ use std::io::{self, Write, Read};
 use byteorder::{WriteBytesExt, ReadBytesExt};
 use super::*;
 
+/// Encode DER tag bytes
 pub fn der_encode_tag_bytes(tag: u32, class: Class, content: ContentType, w: &mut Write) -> io::Result<()> {
     let first_byte = (class as u8) << 6 | (content as u8) << 5 | if tag < 0x1F {tag as u8} else {0x1F};
     try!(w.write_u8(first_byte));
@@ -16,6 +17,9 @@ pub fn der_encode_tag_bytes(tag: u32, class: Class, content: ContentType, w: &mu
     Ok(())
 }
 
+/// Decode DER tag bytes
+///
+/// Result is `(bytes_read, tag, class, content_type)`
 //                                          Bytes Read, Tag, Class, ContentType
 pub fn der_decode_tag_bytes(r: &mut Read) -> io::Result<(usize, u32, Class, ContentType)> {
     let first_byte = try!(r.read_u8());
