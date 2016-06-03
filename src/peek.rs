@@ -1,5 +1,6 @@
 use std::io::{self, Read};
 
+#[doc(hidden)]
 pub struct Peek<T> {
     inner: T,
     buffer: Vec<u8>,

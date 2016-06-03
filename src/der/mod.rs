@@ -1,11 +1,16 @@
+/// Tag encoding/decoding
 pub mod tag;
+/// Length encoding/decoding
 pub mod length;
+/// The Intermediate Type
 pub mod intermediate;
 
 #[cfg(test)]
 mod test;
 
+/// DER Trait
 pub mod der;
+#[doc(hidden)]
 #[macro_use]
 pub mod macros;
 
@@ -14,6 +19,7 @@ pub use self::length::*;
 pub use self::intermediate::Intermediate;
 pub use self::der::DER;
 
+/// DER Universal Tag Values
 #[derive(Debug)]
 pub enum UniversalTag {
     /// End of Content
@@ -80,6 +86,7 @@ pub enum UniversalTag {
     BMPString = 30,
 }
 
+/// DER Class Values
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Class {
     Universal = 0,
@@ -88,6 +95,7 @@ pub enum Class {
     Private = 3,
 }
 
+/// DER ContentType Values
 #[derive(Debug, Clone, Copy)]
 pub enum ContentType {
     Primitive = 0,

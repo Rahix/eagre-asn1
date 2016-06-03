@@ -18,6 +18,9 @@ pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
 }
 
 /// Decode DER length bytes
+///
+/// Result it `(bytes_read, length)`
+///
 pub fn der_decode_length_bytes(r: &mut Read) -> io::Result<(usize, usize)> {
     let first_byte = try!(r.read_u8());
     let mut bytes_read = 1;

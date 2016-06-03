@@ -1,5 +1,6 @@
 use std::io::Write;
 
+/// Deprecated!
 pub trait XEREncodeable {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()>;
     fn xer_name(&self) -> String;
@@ -64,6 +65,7 @@ impl<T: XEREncodeable> XEREncodeable for Vec<T> {
     }
 }
 
+/// Deprecated!
 #[macro_export]
 macro_rules! implement_xer {
     ($struct_name:ident, $($field_name:ident),+) => {
