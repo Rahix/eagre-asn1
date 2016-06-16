@@ -12,10 +12,10 @@
 //!
 //! ```text
 //! User ::= SEQUENCE {
-//! username         UTF8String,
-//! passwordHash     [CONTEXT 12] IMPLICIT OctetString,
-//! age              [APPLICATION 1] EXPLICIT Integer,
-//! admin            Boolean
+//!     username         UTF8String,
+//!     passwordHash     [CONTEXT 12] IMPLICIT OctetString,
+//!     age              [APPLICATION 1] EXPLICIT Integer,
+//!     admin            Boolean
 //! }
 //! ```
 //!
@@ -23,18 +23,18 @@
 //!
 //! ```ignore
 //! struct User {
-//! pub username: String,
-//! pub password_hash: Vec<u8>,
-//! pub age: i32,
-//! pub admin: bool,
+//!     pub username: String,
+//!     pub password_hash: Vec<u8>,
+//!     pub age: i32,
+//!     pub admin: bool,
 //! }
 //!
 //! der_sequence!{
-//! User:
-//! username:      NOTAG                       TYPE String,
-//! password_hash: IMPLICIT TAG CONTEXT 12;    TYPE Vec<u8>,
-//! age:           EXPLICIT TAG APPLICATION 1; TYPE i32,
-//! admin:         NOTAG                       TYPE bool,
+//!     User:
+//!         username:      NOTAG                       TYPE String,
+//!         password_hash: IMPLICIT TAG CONTEXT 12;    TYPE Vec<u8>,
+//!         age:           EXPLICIT TAG APPLICATION 1; TYPE i32,
+//!         admin:         NOTAG                       TYPE bool,
 //! }
 //! ```
 //!
