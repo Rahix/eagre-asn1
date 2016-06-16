@@ -51,7 +51,7 @@ assert_eq!(some_user, decoded);
 [ ] BitString `types::BitString`  
 [ ] BMPString `types::BMPString`  
 [x] Boolean `bool`  
-[ ] CharacterString `types::CharacterString`  
+[x] CharacterString `types::CharacterString`  
 [x] Choice `enum`  
 [ ] Date `types::Date`  
 [ ] DateTime `types::DateTime`  
@@ -59,14 +59,14 @@ assert_eq!(some_user, decoded);
 [ ] EmbeddedPDV `types::EmbeddedPDV`  
 [x] Enumeration `enum`  
 [ ] External  
-[ ] GeneralString `types::GeneralString`  
-[ ] GraphicString `types::GraphicString`  
-[ ] IA5String `types::IA5String`  
+[x] GeneralString `types::GeneralString`  
+[x] GraphicString `types::GraphicString`  
+[x] IA5String `types::IA5String`  
 [ ] InstanceOf  
 [x] Integer `i32`  
 [ ] IRI  
 [x] Null `types::Null`  
-[ ] NumericString `types::NumericString`  
+[x] NumericString `types::NumericString`  
 [ ] ObjectClassField  
 [ ] ObjectIdentifier  
 [x] OctetString `Vec<u8>`  
@@ -78,10 +78,10 @@ assert_eq!(some_user, decoded);
 [x] Sequence Of `Vec<T>`  
 [ ] Set `struct`  
 [ ] Set Of `types::SetOf`  
-[ ] T61String `types::T61String`  
+[x] T61String `types::T61String`  
 [ ] Time `types::Time`  
 [ ] TimeOfDay `types::TimeOfDay`  
-[ ] UniversalString `types::UniversalString`  
+[x] UniversalString `types::UniversalString`  
 [x] UTF8String `String` or `&str`  
-[ ] VideotexString `types::VideotexString`  
-[ ] VisibleString `types::VisibleString`  
+[x] VideotexString `types::VideotexString`  
+[x] VisibleString `types::VisibleString`  
