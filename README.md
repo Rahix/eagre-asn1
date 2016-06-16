@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/Rahix/eagre-asn1.svg?branch=master)](https://travis-ci.org/Rahix/eagre-asn1)
 eagre-asn1
 ==========
 
@@ -6,6 +7,10 @@ eagre-asn1 is an asn1 library for [Rust](https://www.rust-lang.org/).
 It makes heavy use of macros to make the interface easy to use.
 
 Currently only DER and a very small bit of xer is supported.
+
+## Documentation ##
+
+Documentation can be found at [https://rahix.github.io/eagre-asn1/](https://rahix.github.io/eagre-asn1/)
 
 ## Example ##
 Say you have the following asn1 structure:  
