@@ -25,9 +25,7 @@ pub struct Any {
 impl Any {
     /// Create a new Any object from a inner value
     pub fn new<T: DER>(val: T) -> io::Result<Any> {
-        Ok(Any {
-            i: try!(val.der_intermediate()),
-        })
+        Ok(Any { i: try!(val.der_intermediate()) })
     }
 
     /// Resolve the inner value of an Any object
@@ -58,9 +56,7 @@ impl DER for Any {
     }
 
     fn der_from_intermediate(i: Intermediate) -> io::Result<Self> {
-        Ok(Any {
-            i: i,
-        })
+        Ok(Any { i: i })
     }
 }
 

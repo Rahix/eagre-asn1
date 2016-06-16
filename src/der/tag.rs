@@ -3,15 +3,32 @@ use byteorder::{WriteBytesExt, ReadBytesExt};
 use super::*;
 
 /// Encode DER tag bytes
-pub fn der_encode_tag_bytes(tag: u32, class: Class, content: ContentType, w: &mut Write) -> io::Result<()> {
-    let first_byte = (class as u8) << 6 | (content as u8) << 5 | if tag < 0x1F {tag as u8} else {0x1F};
+pub fn der_encode_tag_bytes(tag: u32,
+                            class: Class,
+                            content: ContentType,
+                            w: &mut Write)
+                            -> io::Result<()> {
+    let first_byte = (class as u8) << 6 | (content as u8) << 5 |
+                     if tag < 0x1F {
+        tag as u8
+    } else {
+        0x1F
+    };
     try!(w.write_u8(first_byte));
     if tag > 0x1E {
         let mut bytes = 0;
         let mut tag2 = tag;
-        while tag2 > 0 {bytes+=1;tag2>>=7}
+        while tag2 > 0 {
+            bytes += 1;
+            tag2 >>= 7
+        }
         for i in (0..bytes).rev() {
-            try!(w.write_u8(((tag >> i*7) & 0x7F) as u8 | if i != 0 {0x80} else {0x00}));
+            try!(w.write_u8(((tag >> i * 7) & 0x7F) as u8 |
+                            if i != 0 {
+                0x80
+            } else {
+                0x00
+            }));
         }
     }
     Ok(())
@@ -51,9 +68,8 @@ pub fn der_decode_tag_bytes(r: &mut Read) -> io::Result<(usize, u32, Class, Cont
         }
         for i in 0..bytes.len() {
             let byte = bytes.get(i).unwrap().clone() as u32;
-            tag |= (byte & 0x7f) << 7*(bytes.len()-i-1);
+            tag |= (byte & 0x7f) << 7 * (bytes.len() - i - 1);
         }
     }
     Ok((bytes_read, tag, class, content))
 }
-

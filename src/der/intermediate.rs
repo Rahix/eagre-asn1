@@ -24,7 +24,7 @@ impl Intermediate {
             class: class,
             content_type: ct,
             tag: tag,
-            content: vec!(),
+            content: vec![],
         }
     }
 
@@ -57,7 +57,7 @@ impl Intermediate {
     /// Encode this Intermediate using explicit tagging
     pub fn encode_explicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
         try!(der_encode_tag_bytes(tag, class, ContentType::Constructed, w));
-        let mut stream = io::Cursor::new(vec!());
+        let mut stream = io::Cursor::new(vec![]);
         try!(self.encode(&mut stream));
         let data = stream.into_inner();
         try!(der_encode_length_bytes(data.len(), w));
@@ -78,7 +78,7 @@ impl Intermediate {
         let (_, tag, class, content_type) = try!(der_decode_tag_bytes(r));
         let (_, length) = try!(der_decode_length_bytes(r));
         let mut enc = r.take(length as u64);
-        let mut buf = vec!();
+        let mut buf = vec![];
         try!(enc.read_to_end(&mut buf));
         Ok(Intermediate {
             class: class,
@@ -96,13 +96,18 @@ impl Intermediate {
     }
 
     /// Decode an Intermediate using implicit tagging
-    pub fn decode_implicit(tag: u32, class: Class, r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
+    pub fn decode_implicit(tag: u32,
+                           class: Class,
+                           r: &mut Read)
+                           -> io::Result<(u32, Class, Intermediate)> {
         let (_, tag_impl, class_impl, content_type) = try!(der_decode_tag_bytes(r));
         let (_, length) = try!(der_decode_length_bytes(r));
         let mut enc = r.take(length as u64);
-        let mut buf = vec!();
+        let mut buf = vec![];
         try!(enc.read_to_end(&mut buf));
-        Ok((tag_impl, class_impl, Intermediate {
+        Ok((tag_impl,
+            class_impl,
+            Intermediate {
             class: class,
             content_type: content_type,
             tag: tag,
@@ -114,7 +119,7 @@ impl Intermediate {
 #[test]
 fn test_explicit_tagging() {
     let i = 1234.der_intermediate().unwrap();
-    let mut data = io::Cursor::new(vec!());
+    let mut data = io::Cursor::new(vec![]);
     i.encode_explicit(42, Class::Private, &mut data).unwrap();
     data.set_position(0);
     let (tag, class, intermediate) = Intermediate::decode_explicit(&mut data).unwrap();

@@ -66,6 +66,7 @@ mod tests {
     fn sample() {
         use der::DER;
         let bytes = IA5String::from("FooBar123".to_string()).der_bytes().unwrap();
-        assert_eq!("FooBar123", &String::from(IA5String::der_from_bytes(bytes).unwrap()));
+        assert_eq!("FooBar123",
+                   &String::from(IA5String::der_from_bytes(bytes).unwrap()));
     }
 }

@@ -15,7 +15,7 @@ fn decode_tag_bytes() {
 
 #[test]
 fn decode_invalid_tag_0xff() {
-    let mut stream = ::std::io::Cursor::new(vec!(0xff));
+    let mut stream = ::std::io::Cursor::new(vec![0xff]);
     if let Ok(_) = der_decode_tag_bytes(&mut stream) {
         panic!("This is illegal!");
     }
@@ -59,20 +59,22 @@ fn decode_length() {
 
 #[test]
 fn serialize_bool() {
-    assert_eq!(true, bool::der_from_bytes(true.der_bytes().unwrap()).unwrap());
-    assert_eq!(false, bool::der_from_bytes(false.der_bytes().unwrap()).unwrap());
+    assert_eq!(true,
+               bool::der_from_bytes(true.der_bytes().unwrap()).unwrap());
+    assert_eq!(false,
+               bool::der_from_bytes(false.der_bytes().unwrap()).unwrap());
 }
 
 #[test]
 fn serialize_i32() {
-    for i in vec!(::std::i32::MAX, 65535, 8, 1, 0, -1, -8, -65535, -::std::i32::MAX) {
+    for i in vec![::std::i32::MAX, 65535, 8, 1, 0, -1, -8, -65535, -::std::i32::MAX] {
         assert_eq!(i, i32::der_from_bytes(i.der_bytes().unwrap()).unwrap());
     }
 }
 
 #[test]
 fn i32_no_panic_but_err() {
-    let data = vec!(0x02, 0x07, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF); // Very big integer
+    let data = vec![0x02, 0x07, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]; // Very big integer
     if let Ok(_) = i32::der_from_bytes(data) {
         panic!("Decoded too big Integer");
     }
@@ -80,14 +82,17 @@ fn i32_no_panic_but_err() {
 
 #[test]
 fn serialize_string() {
-    assert_eq!("ThisIsATestWithUtf8: ∅ ".to_string(), 
-               String::der_from_bytes(
-                   "ThisIsATestWithUtf8: ∅ ".to_string().der_bytes().unwrap()).unwrap());
+    assert_eq!("ThisIsATestWithUtf8: ∅ ".to_string(),
+               String::der_from_bytes("ThisIsATestWithUtf8: ∅ "
+                       .to_string()
+                       .der_bytes()
+                       .unwrap())
+                   .unwrap());
 }
 
 #[test]
 fn serialize_sequence_of() {
-    let vec = vec!("I", "am", "the", "master!");
+    let vec = vec!["I", "am", "the", "master!"];
     let ret = Vec::<String>::der_from_bytes(vec.der_bytes().unwrap()).unwrap();
     for i in 0..vec.len() {
         assert_eq!(vec.get(i).unwrap().to_string(), ret.get(i).unwrap().clone());
@@ -96,7 +101,7 @@ fn serialize_sequence_of() {
 
 #[test]
 fn serialize_octet_string() {
-    let vec = vec!(1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8);
+    let vec = vec![1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8];
     let ret = Vec::<u8>::der_from_bytes(vec.der_bytes().unwrap()).unwrap();
     for i in 0..vec.len() {
         assert_eq!(vec.get(i).unwrap().clone(), ret.get(i).unwrap().clone());
@@ -118,16 +123,17 @@ der_sequence!{TestStruct:
 
 #[test]
 fn serialize_sequence() {
-    //use std::io::Write;
-    //use std::fs::File;
+    // use std::io::Write;
+    // use std::fs::File;
     let data = TestStruct {
         alpha: 65535,
         beta: false,
         gamma: "Hello World".to_string(),
     };
-    assert_eq!(data, TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap());
-    //let mut f = File::create("test.ber").unwrap();
-    //f.write_all(&data.der_bytes().unwrap()).unwrap();
+    assert_eq!(data,
+               TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap());
+    // let mut f = File::create("test.ber").unwrap();
+    // f.write_all(&data.der_bytes().unwrap()).unwrap();
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -141,8 +147,9 @@ der_enumerated!(TestEnum, Alpha, Beta, Gamma);
 
 #[test]
 fn serialize_enumerated() {
-    for val in vec!(TestEnum::Alpha, TestEnum::Beta, TestEnum::Gamma) {
-        assert_eq!(val, TestEnum::der_from_bytes(val.der_bytes().unwrap()).unwrap());
+    for val in vec![TestEnum::Alpha, TestEnum::Beta, TestEnum::Gamma] {
+        assert_eq!(val,
+                   TestEnum::der_from_bytes(val.der_bytes().unwrap()).unwrap());
     }
 }
 
@@ -161,7 +168,10 @@ der_choice!{TestChoice:
 
 #[test]
 fn serialize_choice() {
-    for val in vec!(TestChoice::Alpha(1024), TestChoice::Beta(false), TestChoice::Gamma("Hello World".to_string())) {
-        assert_eq!(val, TestChoice::der_from_bytes(val.der_bytes().unwrap()).unwrap());
+    for val in vec![TestChoice::Alpha(1024),
+                    TestChoice::Beta(false),
+                    TestChoice::Gamma("Hello World".to_string())] {
+        assert_eq!(val,
+                   TestChoice::der_from_bytes(val.der_bytes().unwrap()).unwrap());
     }
 }

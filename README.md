@@ -85,3 +85,11 @@ assert_eq!(some_user, decoded);
 [x] UTF8String `String` or `&str`  
 [x] VideotexString `types::VideotexString`  
 [x] VisibleString `types::VisibleString`  
+
+## License ##
+eagre-asn1 is licensed under either of
+
+ * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.

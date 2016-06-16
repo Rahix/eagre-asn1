@@ -38,7 +38,7 @@ use super::*;
 ///    }
 /// }
 /// ```
-pub trait DER : Sized {
+pub trait DER: Sized {
     /// Return universal tag of this type
     fn der_universal_tag() -> UniversalTag;
     /// Return content type of this type
@@ -49,9 +49,11 @@ pub trait DER : Sized {
     fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self>;
     /// Create Intermediate from this object
     fn der_intermediate(&self) -> io::Result<Intermediate> {
-        let mut buf = vec!();
+        let mut buf = vec![];
         try!(self.der_encode_content(&mut buf));
-        Ok(Intermediate::new(Class::Universal, Self::der_content(), Self::der_universal_tag() as u32)
+        Ok(Intermediate::new(Class::Universal,
+                             Self::der_content(),
+                             Self::der_universal_tag() as u32)
             .with_content(buf))
     }
     /// Fully encode into stream ( tag bytes + length bytes + content bytes )
@@ -103,7 +105,8 @@ impl DER for bool {
 
     fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
         if length != 1 {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "boolean value longer that 1 octet"));
+            return Err(io::Error::new(io::ErrorKind::InvalidInput,
+                                      "boolean value longer that 1 octet"));
         }
         Ok(match try!(r.read_u8()) {
             0x00 => false,
@@ -126,9 +129,11 @@ impl DER for i32 {
         try!(bytes.write_i32::<BigEndian>(self.clone()));
         let i = 0;
         loop {
-            if bytes[i] == 0 && i != (bytes.len() - 1) && (bytes[i+1] == 0 || bytes[i+1] & 0x80 == 0) {
+            if bytes[i] == 0 && i != (bytes.len() - 1) &&
+               (bytes[i + 1] == 0 || bytes[i + 1] & 0x80 == 0) {
                 bytes.remove(i);
-            } else if bytes[i] == 0xff && i != (bytes.len() - 1) && (bytes[i+1] == 0xff || bytes[i+1] & 0x80 == 0x80) {
+            } else if bytes[i] == 0xff && i != (bytes.len() - 1) &&
+               (bytes[i + 1] == 0xff || bytes[i + 1] & 0x80 == 0x80) {
                 bytes.remove(i);
             } else {
                 break;
@@ -151,14 +156,16 @@ impl DER for i32 {
         }
         for byte in buffer {
             i -= 1;
-            if i > 3 { // i32 can only handle 4 bytes
-                return Err(io::Error::new(io::ErrorKind::InvalidInput, "Trying to decode too big integer"));
+            if i > 3 {
+                // i32 can only handle 4 bytes
+                return Err(io::Error::new(io::ErrorKind::InvalidInput,
+                                          "Trying to decode too big integer"));
             }
             if fb & 0x80 == 0x80 {
                 value = value & !(0xff << i * 8);
             }
-//          |                                     |
-//          V TODO: Something is not working here V
+            //          |                                     |
+            //          V TODO: Something is not working here V
             value = value | (byte as i32) << i * 8;
         }
         if fb & 0x80 == 0x80 {

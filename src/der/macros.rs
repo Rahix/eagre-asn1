@@ -140,7 +140,7 @@ macro_rules! der_sequence {
 /// }
 ///
 /// # fn main() {
-/// for cmd in vec!(Command::Start(Null), Command::Forward(12), 
+/// for cmd in vec!(Command::Start(Null), Command::Forward(12),
 ///                 Command::Rotate(2), Command::Stop(Null)) {
 ///     let encoded = cmd.der_bytes().unwrap();
 ///     // Send to far away planet

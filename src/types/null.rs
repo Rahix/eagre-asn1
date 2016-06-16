@@ -20,7 +20,8 @@ impl DER for Null {
 
     fn der_decode_content(_: &mut Read, length: usize) -> io::Result<Self> {
         if length != 0 {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "Null Type with size bigger than zero"));
+            return Err(io::Error::new(io::ErrorKind::InvalidInput,
+                                      "Null Type with size bigger than zero"));
         }
         Ok(Null)
     }
