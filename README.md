@@ -1,7 +1,7 @@
 eagre-asn1
 ==========
 
-eagre-asn1 is a asn1 library for [Rust](https://www.rust-lang.org/).
+eagre-asn1 is an asn1 library for [Rust](https://www.rust-lang.org/).
 
 It makes heavy use of macros to make the interface easy to use.
 

@@ -1,7 +1,7 @@
 use std::io::{self, Write, Read};
 use der::*;
 
-/// The Asn1 Any Type
+/// Asn1 Any Type
 ///
 /// Any encoded "Any" type will not be visible in the encoded bytes.
 /// It is a helper type, which should be used in case the actual type is not known yet.

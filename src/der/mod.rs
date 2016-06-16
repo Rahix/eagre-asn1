@@ -89,15 +89,21 @@ pub enum UniversalTag {
 /// DER Class Values
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Class {
+    /// Universal
     Universal = 0,
+    /// Application
     Application = 1,
+    /// ContextSpecific
     ContextSpecific = 2,
+    /// Private
     Private = 3,
 }
 
 /// DER ContentType Values
 #[derive(Debug, Clone, Copy)]
 pub enum ContentType {
+    /// Primitive
     Primitive = 0,
+    /// Constructed
     Constructed = 1,
 }

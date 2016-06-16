@@ -2,8 +2,11 @@ use std::io::Write;
 
 /// Deprecated!
 pub trait XEREncodeable {
+    /// Encode content
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()>;
+    /// Tag name
     fn xer_name(&self) -> String;
+    /// Encode full tag
     fn xer_encode<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
         try!(stream.write(b"<"));
         try!(stream.write(self.xer_name().as_bytes()));

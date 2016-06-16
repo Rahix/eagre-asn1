@@ -2,7 +2,7 @@
 eagre-asn1
 ==========
 
-eagre-asn1 is a asn1 library for [Rust](https://www.rust-lang.org/).
+eagre-asn1 is an asn1 library for [Rust](https://www.rust-lang.org/).
 
 It makes heavy use of macros to make the interface easy to use.
 
@@ -51,6 +51,8 @@ let decoded = User::der_from_bytes(encoded).unwrap();
 assert_eq!(some_user, decoded);
 ```
  */
+
+#![warn(missing_docs)]
 #[doc(hidden)]
 extern crate byteorder;
 
