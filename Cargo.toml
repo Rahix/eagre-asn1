@@ -7,7 +7,7 @@ documentation = "https://rahix.github.io/eagre-asn1/"
 homepage = "https://github.com/Rahix/eagre-asn1"
 repository = "https://github.com/Rahix/eagre-asn1"
 readme = "README.md"
-keywords = ["asn1", "asn.1", "der", "serialization"]
+keywords = ["asn1", "der", "serialization"]
 license = "MIT/Apache-2.0"
 
 
