@@ -51,7 +51,10 @@
 //! ```
 //!
 
-#![warn(missing_docs)]
+#![deny(missing_docs,
+        missing_debug_implementations, missing_copy_implementations,
+        )]
+
 #[doc(hidden)]
 extern crate byteorder;
 

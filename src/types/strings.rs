@@ -9,6 +9,7 @@ macro_rules! string_type {
         /// Currently restricted character sets are not enforced, so it is
         /// the callers job to check wether string contents are legal for
         /// the specific string type
+        #[derive(Debug)]
         pub struct $name(String);
 
         impl From<String> for $name {

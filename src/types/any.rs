@@ -18,6 +18,7 @@ use der::*;
 /// let decoded = Any::der_from_bytes(encoded).unwrap();
 /// assert_eq!("I am a random string", &decoded.resolve::<String>().unwrap());
 /// ```
+#[derive(Debug)]
 pub struct Any {
     i: Intermediate,
 }

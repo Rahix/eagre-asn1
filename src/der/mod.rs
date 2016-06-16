@@ -20,7 +20,7 @@ pub use self::intermediate::Intermediate;
 pub use self::der::DER;
 
 /// DER Universal Tag Values
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum UniversalTag {
     /// End of Content
     EOC = 0,

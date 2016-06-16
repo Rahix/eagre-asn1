@@ -2,7 +2,7 @@ use std::io::{self, Write, Read};
 use der::*;
 
 /// Asn1 Null Type
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Null;
 
 impl DER for Null {

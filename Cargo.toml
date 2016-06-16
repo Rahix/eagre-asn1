@@ -3,7 +3,9 @@ name = "eagre-asn1"
 version = "0.1.0"
 authors = ["Rahix <h.w.seiler@gmx.de>"]
 description = "A asn1 library, currently only supporting DER"
-
+# documentation = ""
+# homepage = ""
+# repository = ""
 readme = "README.md"
 keywords = ["asn1", "asn.1", "der", "serialization"]
 license = "MIT/Apache-2.0"
