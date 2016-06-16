@@ -52,44 +52,44 @@ assert_eq!(some_user, decoded);
 
 ## Implemented Types ##
 
-[x] Any `types::Any`  
-[ ] BitString `types::BitString`  
-[ ] BMPString `types::BMPString`  
-[x] Boolean `bool`  
-[x] CharacterString `types::CharacterString`  
-[x] Choice `enum`  
-[ ] Date `types::Date`  
-[ ] DateTime `types::DateTime`  
-[ ] Duration `std::time::Duration`  
-[ ] EmbeddedPDV `types::EmbeddedPDV`  
-[x] Enumeration `enum`  
-[ ] External  
-[x] GeneralString `types::GeneralString`  
-[x] GraphicString `types::GraphicString`  
-[x] IA5String `types::IA5String`  
-[ ] InstanceOf  
-[x] Integer `i32`  
-[ ] IRI  
-[x] Null `types::Null`  
-[x] NumericString `types::NumericString`  
-[ ] ObjectClassField  
-[ ] ObjectIdentifier  
-[x] OctetString `Vec<u8>`  
-[ ] PrintableString `types::PrintableString`  
-[ ] Real `f32`  
-[ ] RelativeIRI  
-[ ] RelativeOID  
-[x] Sequence `struct`  
-[x] Sequence Of `Vec<T>`  
-[ ] Set `struct`  
-[ ] Set Of `types::SetOf`  
-[x] T61String `types::T61String`  
-[ ] Time `types::Time`  
-[ ] TimeOfDay `types::TimeOfDay`  
-[x] UniversalString `types::UniversalString`  
-[x] UTF8String `String` or `&str`  
-[x] VideotexString `types::VideotexString`  
-[x] VisibleString `types::VisibleString`  
+- [x] Any `types::Any`
+- [ ] BitString `types::BitString`
+- [ ] BMPString `types::BMPString`
+- [x] Boolean `bool`
+- [x] CharacterString `types::CharacterString`
+- [x] Choice `enum`
+- [ ] Date `types::Date`
+- [ ] DateTime `types::DateTime`
+- [ ] Duration `std::time::Duration`
+- [ ] EmbeddedPDV `types::EmbeddedPDV`
+- [x] Enumeration `enum`
+- [ ] External
+- [x] GeneralString `types::GeneralString`
+- [x] GraphicString `types::GraphicString`
+- [x] IA5String `types::IA5String`
+- [ ] InstanceOf
+- [x] Integer `i32`
+- [ ] IRI
+- [x] Null `types::Null`
+- [x] NumericString `types::NumericString`
+- [ ] ObjectClassField
+- [ ] ObjectIdentifier
+- [x] OctetString `Vec<u8>`
+- [ ] PrintableString `types::PrintableString`
+- [ ] Real `f32`
+- [ ] RelativeIRI
+- [ ] RelativeOID
+- [x] Sequence `struct`
+- [x] Sequence Of `Vec<T>`
+- [ ] Set `struct`
+- [ ] Set Of `types::SetOf`
+- [x] T61String `types::T61String`
+- [ ] Time `types::Time`
+- [ ] TimeOfDay `types::TimeOfDay`
+- [x] UniversalString `types::UniversalString`
+- [x] UTF8String `String` or `&str`
+- [x] VideotexString `types::VideotexString`
+- [x] VisibleString `types::VisibleString`
 
 ## License ##
 eagre-asn1 is licensed under either of
