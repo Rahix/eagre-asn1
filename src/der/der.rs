@@ -150,6 +150,9 @@ impl DER for i32 {
         try!(encoded.read_to_end(&mut buffer));
         let mut value = 0;
         let mut i = buffer.len();
+        if i == 0 { // Afl found
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, "Integer with zero content octets"));
+        }
         let fb = buffer[0];
         if fb & 0x80 == 0x80 {
             value = 0xffffffff;
@@ -168,9 +171,10 @@ impl DER for i32 {
             //          V TODO: Something is not working here V
             value = value | (byte as i32) << i * 8;
         }
-        if fb & 0x80 == 0x80 {
+        // Afl found
+        /*if fb & 0x80 == 0x80 {
             value = -(!value + 1);
-        }
+        }*/
         Ok(value)
     }
 }

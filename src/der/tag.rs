@@ -66,6 +66,9 @@ pub fn der_decode_tag_bytes(r: &mut Read) -> io::Result<(usize, u32, Class, Cont
                 break;
             }
         }
+        if (7 * bytes.len()) > (u32::max_value() as f64).log2() as usize { // Afl found
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, "too many tag bytes"));
+        }
         for i in 0..bytes.len() {
             let byte = bytes.get(i).unwrap().clone() as u32;
             tag |= (byte & 0x7f) << 7 * (bytes.len() - i - 1);
