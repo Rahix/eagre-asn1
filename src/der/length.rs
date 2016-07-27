@@ -37,7 +37,6 @@ pub fn der_decode_length_bytes(r: &mut Read) -> io::Result<(usize, usize)> {
         for i in (0..length_length).rev() {
             let byte = try!(r.read_u8()) as usize;
             bytes_read += 1;
-            println!("i: {}", i);
             length |= byte << i * 8;
         }
         Ok((bytes_read, length))
