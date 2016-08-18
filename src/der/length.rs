@@ -30,6 +30,9 @@ pub fn der_decode_length_bytes(r: &mut Read) -> io::Result<(usize, usize)> {
     if (first_byte & 0x80) != 0 {
         // Long form
         let length_length = first_byte & 0x7F;
+        if (length_length as u64 * 8) > (usize::max_value() as f64).log2() as u64 { // Afl found
+            return Err(io::Error::new(io::ErrorKind::InvalidInput, "too big size"));
+        }
         let mut length: usize = 0;
         for i in (0..length_length).rev() {
             let byte = try!(r.read_u8()) as usize;

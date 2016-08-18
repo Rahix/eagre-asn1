@@ -63,7 +63,7 @@ macro_rules! der_sequence {
             }
 
             fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
-                use $crate::der::DER;
+                //use $crate::der::DER;
                 $({
                     let i = try!(self.$field_name.der_intermediate());
                     match stringify!($tagtype) {
@@ -162,7 +162,7 @@ macro_rules! der_choice {
             }
 
             fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
-                use $crate::der::DER;
+                //use $crate::der::DER;
                 match self {
                     $(&$choice_name::$variant_name(ref val) => {
                         let i = try!(val.der_intermediate());
@@ -190,7 +190,7 @@ macro_rules! der_choice {
             }
 
             fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
-                use $crate::der::DER;
+                //use $crate::der::DER;
                 let i = try!($crate::der::Intermediate::decode(r));
                 $(
                     match stringify!($tagtype) {
@@ -269,7 +269,7 @@ macro_rules! der_enumerated {
             }
 
             fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
-                use $crate::der::DER;
+                //use $crate::der::DER;
                 try!(match self {
                     $(&$enum_name::$enum_variant => $enum_name::$enum_variant as i32,)+
                 }.der_encode(w));
@@ -277,7 +277,7 @@ macro_rules! der_enumerated {
             }
 
             fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
-                use $crate::der::DER;
+                //use $crate::der::DER;
                 use std::io;
                 let val = try!(i32::der_decode(r));
                 let mut result = Err(io::Error::new(io::ErrorKind::InvalidInput, "Unknown enum variant"));
