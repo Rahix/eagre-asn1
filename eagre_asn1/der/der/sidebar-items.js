@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["DER","The base trait for DER"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["der_decode_tag_bytes","Decode DER tag bytes"],["der_encode_tag_bytes","Encode DER tag bytes"]]});

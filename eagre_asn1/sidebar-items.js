@@ -1,0 +1,1 @@
+initSidebarItems({"macro":[["der_choice!","Macro to create choice implementation for enum"],["der_enumerated!","Macro to create enumeration implementation for enum"],["der_sequence!","Macro to create sequence implementation for a struct"],["implement_xer!","Deprecated!"]],"mod":[["der","DER Implementation"],["types","Asn1 Types"],["xer","**UNFINISHED** XER Implementation"]]});

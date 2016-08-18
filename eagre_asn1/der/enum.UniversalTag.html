@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `UniversalTag` enum in crate `eagre_asn1`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, UniversalTag">
+
+    <title>eagre_asn1::der::UniversalTag - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>eagre_asn1</a>::<wbr><a href='index.html'>der</a></p><script>window.sidebarCurrent = {name: 'UniversalTag', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>eagre_asn1</a>::<wbr><a href='index.html'>der</a>::<wbr><a class='enum' href=''>UniversalTag</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-398' class='srclink' href='../../src/eagre_asn1/src/der/mod.rs.html#24-87' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum UniversalTag {
+    EOC,
+    Boolean,
+    Integer,
+    BitString,
+    OctetString,
+    Null,
+    ObjectIdentifier,
+    ObjectDescriptor,
+    External,
+    Real,
+    Enumerated,
+    EmbeddedPDV,
+    UTF8String,
+    RelativeOID,
+    Reserved01,
+    Reserved02,
+    Sequence,
+    Set,
+    NumericString,
+    PrintableString,
+    T61String,
+    VideotexString,
+    IA5String,
+    UTCTime,
+    GeneralizedTime,
+    GraphicString,
+    VisibleString,
+    GeneralString,
+    UniversalString,
+    CharacterString,
+    BMPString,
+}</pre><div class='docblock'><p>DER Universal Tag Values</p>
+</div><h2 class='variants'>Variants</h2>
+<table class='variants_table'><tr><td id='variant.EOC'><code>EOC</code></td><td><div class='docblock'><p>End of Content</p>
+</div></td><td></td></tr><tr><td id='variant.Boolean'><code>Boolean</code></td><td><div class='docblock'><p>Boolean</p>
+</div></td><td></td></tr><tr><td id='variant.Integer'><code>Integer</code></td><td><div class='docblock'><p>Integer</p>
+</div></td><td></td></tr><tr><td id='variant.BitString'><code>BitString</code></td><td><div class='docblock'><p>BitString</p>
+</div></td><td></td></tr><tr><td id='variant.OctetString'><code>OctetString</code></td><td><div class='docblock'><p>OctetString</p>
+</div></td><td></td></tr><tr><td id='variant.Null'><code>Null</code></td><td><div class='docblock'><p>Null</p>
+</div></td><td></td></tr><tr><td id='variant.ObjectIdentifier'><code>ObjectIdentifier</code></td><td><div class='docblock'><p>ObjectIdentifier</p>
+</div></td><td></td></tr><tr><td id='variant.ObjectDescriptor'><code>ObjectDescriptor</code></td><td><div class='docblock'><p>ObjectDescriptor</p>
+</div></td><td></td></tr><tr><td id='variant.External'><code>External</code></td><td><div class='docblock'><p>External</p>
+</div></td><td></td></tr><tr><td id='variant.Real'><code>Real</code></td><td><div class='docblock'><p>Real</p>
+</div></td><td></td></tr><tr><td id='variant.Enumerated'><code>Enumerated</code></td><td><div class='docblock'><p>Enumerated</p>
+</div></td><td></td></tr><tr><td id='variant.EmbeddedPDV'><code>EmbeddedPDV</code></td><td><div class='docblock'><p>EmbeddedPDV</p>
+</div></td><td></td></tr><tr><td id='variant.UTF8String'><code>UTF8String</code></td><td><div class='docblock'><p>UTF8String</p>
+</div></td><td></td></tr><tr><td id='variant.RelativeOID'><code>RelativeOID</code></td><td><div class='docblock'><p>RelativeOID</p>
+</div></td><td></td></tr><tr><td id='variant.Reserved01'><code>Reserved01</code></td><td><div class='docblock'><p>Reserved, Unused</p>
+</div></td><td></td></tr><tr><td id='variant.Reserved02'><code>Reserved02</code></td><td><div class='docblock'><p>Reserved, Unused</p>
+</div></td><td></td></tr><tr><td id='variant.Sequence'><code>Sequence</code></td><td><div class='docblock'><p>Sequence</p>
+</div></td><td></td></tr><tr><td id='variant.Set'><code>Set</code></td><td><div class='docblock'><p>Set</p>
+</div></td><td></td></tr><tr><td id='variant.NumericString'><code>NumericString</code></td><td><div class='docblock'><p>NumericString</p>
+</div></td><td></td></tr><tr><td id='variant.PrintableString'><code>PrintableString</code></td><td><div class='docblock'><p>PrintableString</p>
+</div></td><td></td></tr><tr><td id='variant.T61String'><code>T61String</code></td><td><div class='docblock'><p>T61String</p>
+</div></td><td></td></tr><tr><td id='variant.VideotexString'><code>VideotexString</code></td><td><div class='docblock'><p>VideotexString</p>
+</div></td><td></td></tr><tr><td id='variant.IA5String'><code>IA5String</code></td><td><div class='docblock'><p>IA5String</p>
+</div></td><td></td></tr><tr><td id='variant.UTCTime'><code>UTCTime</code></td><td><div class='docblock'><p>UTCTime</p>
+</div></td><td></td></tr><tr><td id='variant.GeneralizedTime'><code>GeneralizedTime</code></td><td><div class='docblock'><p>GeneralizedTime</p>
+</div></td><td></td></tr><tr><td id='variant.GraphicString'><code>GraphicString</code></td><td><div class='docblock'><p>GraphicString</p>
+</div></td><td></td></tr><tr><td id='variant.VisibleString'><code>VisibleString</code></td><td><div class='docblock'><p>VisibleString</p>
+</div></td><td></td></tr><tr><td id='variant.GeneralString'><code>GeneralString</code></td><td><div class='docblock'><p>GeneralString</p>
+</div></td><td></td></tr><tr><td id='variant.UniversalString'><code>UniversalString</code></td><td><div class='docblock'><p>UniversalString</p>
+</div></td><td></td></tr><tr><td id='variant.CharacterString'><code>CharacterString</code></td><td><div class='docblock'><p>CharacterString</p>
+</div></td><td></td></tr><tr><td id='variant.BMPString'><code>BMPString</code></td><td><div class='docblock'><p>BMPString</p>
+</div></td><td></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../eagre_asn1/der/enum.UniversalTag.html' title='eagre_asn1::der::UniversalTag'>UniversalTag</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-461' class='srclink' href='../../src/eagre_asn1/src/der/mod.rs.html#23' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../eagre_asn1/der/enum.UniversalTag.html' title='eagre_asn1::der::UniversalTag'>UniversalTag</a></code></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='enum' href='../../eagre_asn1/der/enum.UniversalTag.html' title='eagre_asn1::der::UniversalTag'>UniversalTag</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-464' class='srclink' href='../../src/eagre_asn1/src/der/mod.rs.html#23' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../eagre_asn1/der/enum.UniversalTag.html' title='eagre_asn1::der::UniversalTag'>UniversalTag</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-465' class='srclink' href='../../src/eagre_asn1/src/der/mod.rs.html#23' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "eagre_asn1";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>
