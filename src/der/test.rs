@@ -1,7 +1,5 @@
 use super::*;
 
-include!("macros.rs");
-
 #[test]
 fn decode_tag_bytes() {
     for i in 0..32000 {
