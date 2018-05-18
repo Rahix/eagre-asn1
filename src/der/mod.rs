@@ -5,14 +5,14 @@ pub mod length;
 /// The Intermediate Type
 pub mod intermediate;
 
-#[cfg(test)]
-mod test;
-
 /// DER Trait
 pub mod der;
 #[doc(hidden)]
 #[macro_use]
 pub mod macros;
+
+#[cfg(test)]
+mod test;
 
 pub use self::tag::*;
 pub use self::length::*;
