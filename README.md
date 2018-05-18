@@ -14,6 +14,7 @@ Documentation can be found at [https://rahix.github.io/eagre-asn1/](https://rahi
 
 ## Example ##
 Say you have the following asn1 structure:  
+
 ```
 User ::= SEQUENCE {
 	username         UTF8String,
@@ -23,6 +24,7 @@ User ::= SEQUENCE {
 }
 ```
 In Rust it would look like this:  
+
 ```rust
 struct User {
 	pub username: String,
@@ -40,6 +42,7 @@ der_sequence!{
 }
 ```
 And serializing is as easy as:  
+
 ```rust
 use eagre_asn1::der::DER;
 
