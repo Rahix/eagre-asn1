@@ -1,5 +1,5 @@
-use std::io::{self, Write, Read};
-use der::*;
+use crate::der::*;
+use std::io::{self, Read, Write};
 
 /// Asn1 Null Type
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -14,14 +14,16 @@ impl DER for Null {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
+    fn der_encode_content(&self, _: &mut dyn Write) -> io::Result<()> {
         Ok(())
     }
 
-    fn der_decode_content(_: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(_: &mut dyn Read, length: usize) -> io::Result<Self> {
         if length != 0 {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput,
-                                      "Null Type with size bigger than zero"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Null Type with size bigger than zero",
+            ));
         }
         Ok(Null)
     }

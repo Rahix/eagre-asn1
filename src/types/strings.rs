@@ -1,4 +1,4 @@
-use der::{self, DER};
+use crate::der::{self, DER};
 use std::io::{self, Read, Write};
 
 // Macro for lazy people like me
@@ -33,19 +33,19 @@ macro_rules! string_type {
                 der::ContentType::Primitive
             }
 
-            fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
-                try!(w.write(self.0.as_bytes()));
+            fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
+                w.write(self.0.as_bytes())?;
                 Ok(())
             }
 
-            fn der_decode_content(r: &mut Read, length: usize) -> io::Result<$name> {
+            fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<$name> {
                 let mut encoded = r.take(length as u64);
                 let mut buffer = String::new();
-                try!(encoded.read_to_string(&mut buffer));
+                encoded.read_to_string(&mut buffer)?;
                 Ok($name(buffer))
             }
         }
-    }
+    };
 }
 
 string_type!(NumericString);
@@ -66,8 +66,12 @@ mod tests {
     #[test]
     fn sample() {
         use der::DER;
-        let bytes = IA5String::from("FooBar123".to_string()).der_bytes().unwrap();
-        assert_eq!("FooBar123",
-                   &String::from(IA5String::der_from_bytes(bytes).unwrap()));
+        let bytes = IA5String::from("FooBar123".to_string())
+            .der_bytes()
+            .unwrap();
+        assert_eq!(
+            "FooBar123",
+            &String::from(IA5String::der_from_bytes(bytes).unwrap())
+        );
     }
 }

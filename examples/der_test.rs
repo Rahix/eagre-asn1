@@ -8,7 +8,7 @@ struct User {
     pub male: bool,
 }
 
-der_sequence!{
+der_sequence! {
     User:
     name: NOTAG TYPE String,
     male: NOTAG TYPE bool,

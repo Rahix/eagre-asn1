@@ -1,10 +1,10 @@
-use std::io::{self, Write, Read};
-use byteorder::{WriteBytesExt, ReadBytesExt};
+use byteorder::{ReadBytesExt, WriteBytesExt};
+use std::io::{self, Read, Write};
 
 /// Encode DER length bytes
-pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
+pub fn der_encode_length_bytes(length: usize, w: &mut dyn Write) -> io::Result<()> {
     if length < 0x80 {
-        try!(w.write_u8(length as u8));
+        w.write_u8(length as u8)?;
     } else {
         let mut length_bytes = 0;
         let mut l2 = length;
@@ -12,9 +12,9 @@ pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
             length_bytes += 1;
             l2 >>= 8
         }
-        try!(w.write_u8(0x80 | length_bytes));
+        w.write_u8(0x80 | length_bytes)?;
         for i in (0..length_bytes).rev() {
-            try!(w.write_u8((length >> i * 8) as u8 & 0xFF));
+            w.write_u8((length >> i * 8) as u8 & 0xFF)?;
         }
     }
     Ok(())
@@ -24,18 +24,19 @@ pub fn der_encode_length_bytes(length: usize, w: &mut Write) -> io::Result<()> {
 ///
 /// Result it `(bytes_read, length)`
 ///
-pub fn der_decode_length_bytes(r: &mut Read) -> io::Result<(usize, usize)> {
-    let first_byte = try!(r.read_u8());
+pub fn der_decode_length_bytes(r: &mut dyn Read) -> io::Result<(usize, usize)> {
+    let first_byte = r.read_u8()?;
     let mut bytes_read = 1;
     if (first_byte & 0x80) != 0 {
         // Long form
         let length_length = first_byte & 0x7F;
-        if (length_length as u64 * 8) > (usize::max_value() as f64).log2() as u64 { // Afl found
+        if (length_length as u64 * 8) > (usize::max_value() as f64).log2() as u64 {
+            // Afl found
             return Err(io::Error::new(io::ErrorKind::InvalidInput, "too big size"));
         }
         let mut length: usize = 0;
         for i in (0..length_length).rev() {
-            let byte = try!(r.read_u8()) as usize;
+            let byte = r.read_u8()? as usize;
             bytes_read += 1;
             length |= byte << i * 8;
         }

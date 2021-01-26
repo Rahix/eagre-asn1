@@ -51,9 +51,11 @@
 //! ```
 //!
 
-#![deny(missing_docs,
-        missing_debug_implementations, missing_copy_implementations,
-        )]
+#![deny(
+    missing_docs,
+    missing_debug_implementations,
+    missing_copy_implementations
+)]
 
 #[doc(hidden)]
 extern crate byteorder;
@@ -81,5 +83,5 @@ macro_rules! debug_xer {
                 write!(f, "{}", ::std::string::String::from_utf8(stream).unwrap())
             }
         }
-    }
+    };
 }

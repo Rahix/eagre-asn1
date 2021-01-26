@@ -1,5 +1,5 @@
-use std::io::{self, Write, Read};
-use byteorder::{WriteBytesExt, BigEndian, ReadBytesExt};
+use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
+use std::io::{self, Read, Write};
 
 use super::*;
 
@@ -26,11 +26,11 @@ use super::*;
 ///        ContentType::Primitive
 ///    }
 ///
-///    fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
+///    fn der_encode_content(&self, _: &mut dyn Write) -> io::Result<()> {
 ///        Ok(())
 ///    }
 ///
-///    fn der_decode_content(_: &mut Read, length: usize) -> io::Result<Self> {
+///    fn der_decode_content(_: &mut dyn Read, length: usize) -> io::Result<Self> {
 ///        if length != 0 {
 ///            return Err(io::Error::new(io::ErrorKind::InvalidInput, "Null Type with size bigger than zero"));
 ///        }
@@ -44,27 +44,29 @@ pub trait DER: Sized {
     /// Return content type of this type
     fn der_content() -> ContentType;
     /// Encode the content octets
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()>;
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()>;
     /// Decode the content octets
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self>;
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self>;
     /// Create Intermediate from this object
     fn der_intermediate(&self) -> io::Result<Intermediate> {
         let mut buf = vec![];
-        try!(self.der_encode_content(&mut buf));
-        Ok(Intermediate::new(Class::Universal,
-                             Self::der_content(),
-                             Self::der_universal_tag() as u32)
-            .with_content(buf))
+        self.der_encode_content(&mut buf)?;
+        Ok(Intermediate::new(
+            Class::Universal,
+            Self::der_content(),
+            Self::der_universal_tag() as u32,
+        )
+        .with_content(buf))
     }
     /// Fully encode into stream ( tag bytes + length bytes + content bytes )
-    fn der_encode(&self, w: &mut Write) -> io::Result<()> {
-        try!(try!(self.der_intermediate()).encode(w));
+    fn der_encode(&self, w: &mut dyn Write) -> io::Result<()> {
+        self.der_intermediate()?.encode(w)?;
         Ok(())
     }
     /// Return fully encoded bytes (wrapper for der_encode() for easier use)
     fn der_bytes(&self) -> io::Result<Vec<u8>> {
         let mut stream = Vec::new();
-        try!(self.der_encode(&mut stream));
+        self.der_encode(&mut stream)?;
         Ok(stream)
     }
     /// Create object from Intermediate
@@ -74,8 +76,8 @@ pub trait DER: Sized {
         Self::der_decode_content(&mut stream, length)
     }
     /// Create object from stream
-    fn der_decode(r: &mut Read) -> io::Result<Self> {
-        let i = try!(Intermediate::decode(r));
+    fn der_decode(r: &mut dyn Read) -> io::Result<Self> {
+        let i = Intermediate::decode(r)?;
         Self::der_from_intermediate(i)
     }
     /// Create object from bytes
@@ -95,20 +97,22 @@ impl DER for bool {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
         match self {
-            &true => try!(w.write_u8(0xFF)),
-            &false => try!(w.write_u8(0x00)),
+            &true => w.write_u8(0xFF)?,
+            &false => w.write_u8(0x00)?,
         }
         Ok(())
     }
 
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         if length != 1 {
-            return Err(io::Error::new(io::ErrorKind::InvalidInput,
-                                      "boolean value longer that 1 octet"));
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "boolean value longer that 1 octet",
+            ));
         }
-        Ok(match try!(r.read_u8()) {
+        Ok(match r.read_u8()? {
             0x00 => false,
             _ => true,
         })
@@ -124,34 +128,42 @@ impl DER for i32 {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
         let mut bytes = Vec::new();
-        try!(bytes.write_i32::<BigEndian>(self.clone()));
+        bytes.write_i32::<BigEndian>(self.clone())?;
         let i = 0;
         loop {
-            if bytes[i] == 0 && i != (bytes.len() - 1) &&
-               (bytes[i + 1] == 0 || bytes[i + 1] & 0x80 == 0) {
+            if bytes[i] == 0
+                && i != (bytes.len() - 1)
+                && (bytes[i + 1] == 0 || bytes[i + 1] & 0x80 == 0)
+            {
                 bytes.remove(i);
-            } else if bytes[i] == 0xff && i != (bytes.len() - 1) &&
-               (bytes[i + 1] == 0xff || bytes[i + 1] & 0x80 == 0x80) {
+            } else if bytes[i] == 0xff
+                && i != (bytes.len() - 1)
+                && (bytes[i + 1] == 0xff || bytes[i + 1] & 0x80 == 0x80)
+            {
                 bytes.remove(i);
             } else {
                 break;
             }
         }
-        try!(w.write(&bytes));
+        w.write(&bytes)?;
         Ok(())
     }
 
     #[allow(overflowing_literals)]
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         let mut encoded = r.take(length as u64);
         let mut buffer = Vec::new();
-        try!(encoded.read_to_end(&mut buffer));
+        encoded.read_to_end(&mut buffer)?;
         let mut value = 0;
         let mut i = buffer.len();
-        if i == 0 { // Afl found
-            return Err(io::Error::new(io::ErrorKind::InvalidInput, "Integer with zero content octets"));
+        if i == 0 {
+            // Afl found
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Integer with zero content octets",
+            ));
         }
         let fb = buffer[0];
         if fb & 0x80 == 0x80 {
@@ -161,8 +173,10 @@ impl DER for i32 {
             i -= 1;
             if i > 3 {
                 // i32 can only handle 4 bytes
-                return Err(io::Error::new(io::ErrorKind::InvalidInput,
-                                          "Trying to decode too big integer"));
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Trying to decode too big integer",
+                ));
             }
             if fb & 0x80 == 0x80 {
                 value = value & !(0xff << i * 8);
@@ -188,15 +202,15 @@ impl DER for String {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
-        try!(w.write(self.as_bytes()));
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
+        w.write(self.as_bytes())?;
         Ok(())
     }
 
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         let mut encoded = r.take(length as u64);
         let mut buffer = String::new();
-        try!(encoded.read_to_string(&mut buffer));
+        encoded.read_to_string(&mut buffer)?;
         Ok(buffer)
     }
 }
@@ -210,15 +224,15 @@ impl<'a> DER for &'a str {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
-        try!(w.write(self.as_bytes()));
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
+        w.write(self.as_bytes())?;
         Ok(())
     }
 
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         let mut encoded = r.take(length as u64);
         let mut buffer = String::new();
-        try!(encoded.read_to_string(&mut buffer));
+        encoded.read_to_string(&mut buffer)?;
         Ok("not_implemented_yet")
     }
 }
@@ -232,18 +246,18 @@ impl<T: DER> DER for Vec<T> {
         ContentType::Constructed
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
         for item in self.iter() {
-            try!(item.der_encode(w));
+            item.der_encode(w)?;
         }
         Ok(())
     }
 
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         let mut encoded = r.take(length as u64);
         let mut vector = Vec::new();
         while encoded.limit() > 0 {
-            vector.push(try!(T::der_decode(&mut encoded)));
+            vector.push(T::der_decode(&mut encoded)?);
         }
         Ok(vector)
     }
@@ -258,14 +272,14 @@ impl DER for Vec<u8> {
         ContentType::Primitive
     }
 
-    fn der_encode_content(&self, w: &mut Write) -> io::Result<()> {
-        try!(w.write(self));
+    fn der_encode_content(&self, w: &mut dyn Write) -> io::Result<()> {
+        w.write(self)?;
         Ok(())
     }
 
-    fn der_decode_content(r: &mut Read, length: usize) -> io::Result<Self> {
+    fn der_decode_content(r: &mut dyn Read, length: usize) -> io::Result<Self> {
         let mut buffer = Vec::new();
-        try!(r.take(length as u64).read_to_end(&mut buffer));
+        r.take(length as u64).read_to_end(&mut buffer)?;
         Ok(buffer)
     }
 }

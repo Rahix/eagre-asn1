@@ -62,26 +62,26 @@ macro_rules! der_sequence {
                 $crate::der::ContentType::Constructed
             }
 
-            fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
+            fn der_encode_content(&self, w: &mut dyn ::std::io::Write) -> ::std::io::Result<()> {
                 //use $crate::der::DER;
                 $({
-                    let i = try!(self.$field_name.der_intermediate());
+                    let i = self.$field_name.der_intermediate()?;
                     match stringify!($tagtype) {
-                        "NOTAG" => try!(i.encode(w)),
-                        $("EXPLICIT" => try!(i.encode_explicit($tagval, match stringify!($tagclass) {
+                        "NOTAG" => i.encode(w)?,
+                        $("EXPLICIT" => i.encode_explicit($tagval, match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
                                                                               "APPLICATION" => $crate::der::Class::Application,
                                                                               "CONTEXT" => $crate::der::Class::ContextSpecific,
                                                                               "PRIVATE" => $crate::der::Class::Private,
                                                                               _ => unreachable!(),
-                            }, w)),
-                          "IMPLICIT" => try!(i.encode_implicit($tagval, match stringify!($tagclass) {
+                            }, w)?,
+                          "IMPLICIT" => i.encode_implicit($tagval, match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
                                                                               "APPLICATION" => $crate::der::Class::Application,
                                                                               "CONTEXT" => $crate::der::Class::ContextSpecific,
                                                                               "PRIVATE" => $crate::der::Class::Private,
                                                                               _ => unreachable!(),
-                            }, w)),
+                            }, w)?,
                             )*
                         _ => unreachable!(),
                     }
@@ -89,15 +89,15 @@ macro_rules! der_sequence {
                 Ok(())
             }
 
-            fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
+            fn der_decode_content(r: &mut dyn ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
                 $(
                     let i = match stringify!($tagtype) {
-                        "NOTAG" => try!($crate::der::Intermediate::decode(r)),
-                        "EXPLICIT" => try!($crate::der::Intermediate::decode_explicit(r)).2,
-                        "IMPLICIT" => try!($crate::der::Intermediate::decode_implicit(<$field_type>::der_universal_tag() as u32, $crate::der::Class::Universal, r)).2,
+                        "NOTAG" => $crate::der::Intermediate::decode(r)?,
+                        "EXPLICIT" => $crate::der::Intermediate::decode_explicit(r)?.2,
+                        "IMPLICIT" => $crate::der::Intermediate::decode_implicit(<$field_type>::der_universal_tag() as u32, $crate::der::Class::Universal, r)?.2,
                         _ => unreachable!(),
                     };
-                    let $field_name : $field_type = try!($crate::der::DER::der_from_intermediate(i));
+                    let $field_name : $field_type = $crate::der::DER::der_from_intermediate(i)?;
                 )+
                 Ok($struct_name {
                     $(
@@ -161,27 +161,27 @@ macro_rules! der_choice {
                 $crate::der::ContentType::Constructed
             }
 
-            fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
+            fn der_encode_content(&self, w: &mut dyn ::std::io::Write) -> ::std::io::Result<()> {
                 //use $crate::der::DER;
                 match self {
                     $(&$choice_name::$variant_name(ref val) => {
-                        let i = try!(val.der_intermediate());
+                        let i = val.der_intermediate()?;
                         match stringify!($tagtype) {
-                            "NOTAG" => try!(i.encode(w)),
-                            $("EXPLICIT" => try!(i.encode_explicit($tagval, match stringify!($tagclass) {
+                            "NOTAG" => i.encode(w)?,
+                            $("EXPLICIT" => i.encode_explicit($tagval, match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
                                                                               "APPLICATION" => $crate::der::Class::Application,
                                                                               "CONTEXT" => $crate::der::Class::ContextSpecific,
                                                                               "PRIVATE" => $crate::der::Class::Private,
                                                                               _ => unreachable!(),
-                                }, w)),
-                            "IMPLICIT" => try!(i.encode_implicit($tagval, match stringify!($tagclass) {
+                                }, w)?,
+                            "IMPLICIT" => i.encode_implicit($tagval, match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
                                                                               "APPLICATION" => $crate::der::Class::Application,
                                                                               "CONTEXT" => $crate::der::Class::ContextSpecific,
                                                                               "PRIVATE" => $crate::der::Class::Private,
                                                                               _ => unreachable!(),
-                                }, w)),)*
+                                }, w)?,)*
                             _ => unreachable!(),
                     }
                     },)+
@@ -189,13 +189,13 @@ macro_rules! der_choice {
                 Ok(())
             }
 
-            fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
+            fn der_decode_content(r: &mut dyn ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
                 //use $crate::der::DER;
-                let i = try!($crate::der::Intermediate::decode(r));
+                let i = $crate::der::Intermediate::decode(r)?;
                 $(
                     match stringify!($tagtype) {
                         "NOTAG" => if i.tag == <$variant_type>::der_universal_tag() as u32 && i.class == $crate::der::Class::Universal {
-                            return Ok($choice_name::$variant_name(try!(<$variant_type>::der_from_intermediate(i))));
+                            return Ok($choice_name::$variant_name(<$variant_type>::der_from_intermediate(i)?));
                         },
                         $("EXPLICIT" => if i.tag == $tagval && i.class == match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
@@ -204,7 +204,7 @@ macro_rules! der_choice {
                                                                               "PRIVATE" => $crate::der::Class::Private,
                                                                               _ => unreachable!(),
                                                                           } {
-                            return Ok($choice_name::$variant_name(try!(<$variant_type>::der_from_bytes(i.content))));
+                            return Ok($choice_name::$variant_name(<$variant_type>::der_from_bytes(i.content)?));
                         },
                         "IMPLICIT" => if i.tag == $tagval && i.class == match stringify!($tagclass) {
                                                                               "UNIVERSAL" => $crate::der::Class::Universal,
@@ -216,7 +216,7 @@ macro_rules! der_choice {
                             let mut i = i;
                             i.tag = <$variant_type>::der_universal_tag() as u32;
                             i.class = $crate::der::Class::Universal;
-                            return Ok($choice_name::$variant_name(try!(<$variant_type>::der_from_intermediate(i))));
+                            return Ok($choice_name::$variant_name(<$variant_type>::der_from_intermediate(i)?));
                         },)*
                         _ => unreachable!(),
                     }
@@ -268,18 +268,18 @@ macro_rules! der_enumerated {
                 $crate::der::ContentType::Primitive
             }
 
-            fn der_encode_content(&self, w: &mut ::std::io::Write) -> ::std::io::Result<()> {
+            fn der_encode_content(&self, w: &mut dyn ::std::io::Write) -> ::std::io::Result<()> {
                 //use $crate::der::DER;
-                try!(match self {
+                match self {
                     $(&$enum_name::$enum_variant => $enum_name::$enum_variant as i32,)+
-                }.der_encode(w));
+                }.der_encode(w)?;
                 Ok(())
             }
 
-            fn der_decode_content(r: &mut ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
+            fn der_decode_content(r: &mut dyn ::std::io::Read, _: usize) -> ::std::io::Result<Self> {
                 //use $crate::der::DER;
                 use std::io;
-                let val = try!(i32::der_decode(r));
+                let val = i32::der_decode(r)?;
                 let mut result = Err(io::Error::new(io::ErrorKind::InvalidInput, "Unknown enum variant"));
                 $(
                     if val == $enum_name::$enum_variant as i32 {

@@ -1,9 +1,9 @@
-/// Tag encoding/decoding
-pub mod tag;
-/// Length encoding/decoding
-pub mod length;
 /// The Intermediate Type
 pub mod intermediate;
+/// Length encoding/decoding
+pub mod length;
+/// Tag encoding/decoding
+pub mod tag;
 
 /// DER Trait
 pub mod der;
@@ -14,10 +14,10 @@ pub mod macros;
 #[cfg(test)]
 mod test;
 
-pub use self::tag::*;
-pub use self::length::*;
-pub use self::intermediate::Intermediate;
 pub use self::der::DER;
+pub use self::intermediate::Intermediate;
+pub use self::length::*;
+pub use self::tag::*;
 
 /// DER Universal Tag Values
 #[derive(Debug, Copy, Clone)]

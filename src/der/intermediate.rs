@@ -1,4 +1,4 @@
-use std::io::{self, Write, Read};
+use std::io::{self, Read, Write};
 
 use super::*;
 
@@ -47,39 +47,39 @@ impl Intermediate {
     }
 
     /// Encode this Intermediate
-    pub fn encode(&self, w: &mut Write) -> io::Result<()> {
-        try!(der_encode_tag_bytes(self.tag, self.class, self.content_type, w));
-        try!(der_encode_length_bytes(self.content.len(), w));
-        try!(w.write(&self.content));
+    pub fn encode(&self, w: &mut dyn Write) -> io::Result<()> {
+        der_encode_tag_bytes(self.tag, self.class, self.content_type, w)?;
+        der_encode_length_bytes(self.content.len(), w)?;
+        w.write(&self.content)?;
         Ok(())
     }
 
     /// Encode this Intermediate using explicit tagging
-    pub fn encode_explicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
-        try!(der_encode_tag_bytes(tag, class, ContentType::Constructed, w));
+    pub fn encode_explicit(&self, tag: u32, class: Class, w: &mut dyn Write) -> io::Result<()> {
+        der_encode_tag_bytes(tag, class, ContentType::Constructed, w)?;
         let mut stream = io::Cursor::new(vec![]);
-        try!(self.encode(&mut stream));
+        self.encode(&mut stream)?;
         let data = stream.into_inner();
-        try!(der_encode_length_bytes(data.len(), w));
-        try!(w.write(&data));
+        der_encode_length_bytes(data.len(), w)?;
+        w.write(&data)?;
         Ok(())
     }
 
     /// Encode this Intermediate using implicit tagging
-    pub fn encode_implicit(&self, tag: u32, class: Class, w: &mut Write) -> io::Result<()> {
-        try!(der_encode_tag_bytes(tag, class, self.content_type, w));
-        try!(der_encode_length_bytes(self.content.len(), w));
-        try!(w.write(&self.content));
+    pub fn encode_implicit(&self, tag: u32, class: Class, w: &mut dyn Write) -> io::Result<()> {
+        der_encode_tag_bytes(tag, class, self.content_type, w)?;
+        der_encode_length_bytes(self.content.len(), w)?;
+        w.write(&self.content)?;
         Ok(())
     }
 
     /// Decode an Intermediate
-    pub fn decode(r: &mut Read) -> io::Result<Intermediate> {
-        let (_, tag, class, content_type) = try!(der_decode_tag_bytes(r));
-        let (_, length) = try!(der_decode_length_bytes(r));
+    pub fn decode(r: &mut dyn Read) -> io::Result<Intermediate> {
+        let (_, tag, class, content_type) = der_decode_tag_bytes(r)?;
+        let (_, length) = der_decode_length_bytes(r)?;
         let mut enc = r.take(length as u64);
         let mut buf = vec![];
-        try!(enc.read_to_end(&mut buf));
+        enc.read_to_end(&mut buf)?;
         Ok(Intermediate {
             class: class,
             content_type: content_type,
@@ -89,30 +89,33 @@ impl Intermediate {
     }
 
     /// Decode an Intermediate using explicit tagging
-    pub fn decode_explicit(r: &mut Read) -> io::Result<(u32, Class, Intermediate)> {
-        let (_, tag, class, _) = try!(der_decode_tag_bytes(r));
-        let (_, _) = try!(der_decode_length_bytes(r));
-        Ok((tag, class, try!(Intermediate::decode(r))))
+    pub fn decode_explicit(r: &mut dyn Read) -> io::Result<(u32, Class, Intermediate)> {
+        let (_, tag, class, _) = der_decode_tag_bytes(r)?;
+        let (_, _) = der_decode_length_bytes(r)?;
+        Ok((tag, class, Intermediate::decode(r)?))
     }
 
     /// Decode an Intermediate using implicit tagging
-    pub fn decode_implicit(tag: u32,
-                           class: Class,
-                           r: &mut Read)
-                           -> io::Result<(u32, Class, Intermediate)> {
-        let (_, tag_impl, class_impl, content_type) = try!(der_decode_tag_bytes(r));
-        let (_, length) = try!(der_decode_length_bytes(r));
+    pub fn decode_implicit(
+        tag: u32,
+        class: Class,
+        r: &mut dyn Read,
+    ) -> io::Result<(u32, Class, Intermediate)> {
+        let (_, tag_impl, class_impl, content_type) = der_decode_tag_bytes(r)?;
+        let (_, length) = der_decode_length_bytes(r)?;
         let mut enc = r.take(length as u64);
         let mut buf = vec![];
-        try!(enc.read_to_end(&mut buf));
-        Ok((tag_impl,
+        enc.read_to_end(&mut buf)?;
+        Ok((
+            tag_impl,
             class_impl,
             Intermediate {
-            class: class,
-            content_type: content_type,
-            tag: tag,
-            content: buf,
-        }))
+                class: class,
+                content_type: content_type,
+                tag: tag,
+                content: buf,
+            },
+        ))
     }
 }
 

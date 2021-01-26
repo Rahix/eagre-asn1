@@ -57,15 +57,29 @@ fn decode_length() {
 
 #[test]
 fn serialize_bool() {
-    assert_eq!(true,
-               bool::der_from_bytes(true.der_bytes().unwrap()).unwrap());
-    assert_eq!(false,
-               bool::der_from_bytes(false.der_bytes().unwrap()).unwrap());
+    assert_eq!(
+        true,
+        bool::der_from_bytes(true.der_bytes().unwrap()).unwrap()
+    );
+    assert_eq!(
+        false,
+        bool::der_from_bytes(false.der_bytes().unwrap()).unwrap()
+    );
 }
 
 #[test]
 fn serialize_i32() {
-    for i in vec![::std::i32::MAX, 65535, 8, 1, 0, -1, -8, -65535, -::std::i32::MAX] {
+    for i in vec![
+        ::std::i32::MAX,
+        65535,
+        8,
+        1,
+        0,
+        -1,
+        -8,
+        -65535,
+        -::std::i32::MAX,
+    ] {
         assert_eq!(i, i32::der_from_bytes(i.der_bytes().unwrap()).unwrap());
     }
 }
@@ -80,12 +94,10 @@ fn i32_no_panic_but_err() {
 
 #[test]
 fn serialize_string() {
-    assert_eq!("ThisIsATestWithUtf8: ∅ ".to_string(),
-               String::der_from_bytes("ThisIsATestWithUtf8: ∅ "
-                       .to_string()
-                       .der_bytes()
-                       .unwrap())
-                   .unwrap());
+    assert_eq!(
+        "ThisIsATestWithUtf8: ∅ ".to_string(),
+        String::der_from_bytes("ThisIsATestWithUtf8: ∅ ".to_string().der_bytes().unwrap()).unwrap()
+    );
 }
 
 #[test]
@@ -113,7 +125,7 @@ struct TestStruct {
     pub gamma: String,
 }
 
-der_sequence!{TestStruct:
+der_sequence! {TestStruct:
     alpha: NOTAG TYPE i32,
     beta: EXPLICIT TAG CONTEXT 42; TYPE bool,
     gamma: IMPLICIT TAG APPLICATION 397; TYPE String,
@@ -128,8 +140,10 @@ fn serialize_sequence() {
         beta: false,
         gamma: "Hello World".to_string(),
     };
-    assert_eq!(data,
-               TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap());
+    assert_eq!(
+        data,
+        TestStruct::der_from_bytes(data.der_bytes().unwrap()).unwrap()
+    );
     // let mut f = File::create("test.ber").unwrap();
     // f.write_all(&data.der_bytes().unwrap()).unwrap();
 }
@@ -146,8 +160,10 @@ der_enumerated!(TestEnum, Alpha, Beta, Gamma);
 #[test]
 fn serialize_enumerated() {
     for val in vec![TestEnum::Alpha, TestEnum::Beta, TestEnum::Gamma] {
-        assert_eq!(val,
-                   TestEnum::der_from_bytes(val.der_bytes().unwrap()).unwrap());
+        assert_eq!(
+            val,
+            TestEnum::der_from_bytes(val.der_bytes().unwrap()).unwrap()
+        );
     }
 }
 
@@ -158,7 +174,7 @@ enum TestChoice {
     Gamma(String),
 }
 
-der_choice!{TestChoice:
+der_choice! {TestChoice:
     Alpha: NOTAG TYPE i32,
     Beta: EXPLICIT TAG CONTEXT 42; TYPE bool,
     Gamma: IMPLICIT TAG APPLICATION 397; TYPE String,
@@ -166,10 +182,14 @@ der_choice!{TestChoice:
 
 #[test]
 fn serialize_choice() {
-    for val in vec![TestChoice::Alpha(1024),
-                    TestChoice::Beta(false),
-                    TestChoice::Gamma("Hello World".to_string())] {
-        assert_eq!(val,
-                   TestChoice::der_from_bytes(val.der_bytes().unwrap()).unwrap());
+    for val in vec![
+        TestChoice::Alpha(1024),
+        TestChoice::Beta(false),
+        TestChoice::Gamma("Hello World".to_string()),
+    ] {
+        assert_eq!(
+            val,
+            TestChoice::der_from_bytes(val.der_bytes().unwrap()).unwrap()
+        );
     }
 }

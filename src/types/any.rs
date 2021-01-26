@@ -1,5 +1,5 @@
-use std::io::{self, Write, Read};
-use der::*;
+use crate::der::*;
+use std::io::{self, Read, Write};
 
 /// Asn1 Any Type
 ///
@@ -26,7 +26,9 @@ pub struct Any {
 impl Any {
     /// Create a new Any object from a inner value
     pub fn new<T: DER>(val: T) -> io::Result<Any> {
-        Ok(Any { i: try!(val.der_intermediate()) })
+        Ok(Any {
+            i: val.der_intermediate()?,
+        })
     }
 
     /// Resolve the inner value of an Any object
@@ -44,11 +46,11 @@ impl DER for Any {
         unimplemented!() // Same as universal tag
     }
 
-    fn der_encode_content(&self, _: &mut Write) -> io::Result<()> {
+    fn der_encode_content(&self, _: &mut dyn Write) -> io::Result<()> {
         unimplemented!()
     }
 
-    fn der_decode_content(_: &mut Read, _: usize) -> io::Result<Self> {
+    fn der_decode_content(_: &mut dyn Read, _: usize) -> io::Result<Self> {
         unimplemented!()
     }
 

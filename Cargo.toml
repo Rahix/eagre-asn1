@@ -9,7 +9,7 @@ repository = "https://github.com/Rahix/eagre-asn1"
 readme = "README.md"
 keywords = ["asn1", "der", "serialization"]
 license = "MIT/Apache-2.0"
-
+edition = "2018"
 
 [dependencies]
 byteorder = "0.4.2"

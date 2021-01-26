@@ -8,23 +8,23 @@ pub trait XEREncodeable {
     fn xer_name(&self) -> String;
     /// Encode full tag
     fn xer_encode<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
-        try!(stream.write(b"<"));
-        try!(stream.write(self.xer_name().as_bytes()));
-        try!(stream.write(b">"));
-        try!(self.xer_encode_content(stream));
-        try!(stream.write(b"</"));
-        try!(stream.write(self.xer_name().as_bytes()));
-        try!(stream.write(b">"));
+        stream.write(b"<")?;
+        stream.write(self.xer_name().as_bytes())?;
+        stream.write(b">")?;
+        self.xer_encode_content(stream)?;
+        stream.write(b"</")?;
+        stream.write(self.xer_name().as_bytes())?;
+        stream.write(b">")?;
         Ok(())
     }
 }
 
 impl XEREncodeable for bool {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
-        try!(stream.write(match self {
+        stream.write(match self {
             &true => "True".as_bytes(),
             &false => "False".as_bytes(),
-        }));
+        })?;
         Ok(())
     }
 
@@ -35,7 +35,7 @@ impl XEREncodeable for bool {
 
 impl XEREncodeable for String {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
-        try!(stream.write(self.as_bytes()));
+        stream.write(self.as_bytes())?;
         Ok(())
     }
 
@@ -46,7 +46,7 @@ impl XEREncodeable for String {
 
 impl XEREncodeable for i32 {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
-        try!(stream.write(format!("{}", self).as_bytes()));
+        stream.write(format!("{}", self).as_bytes())?;
         Ok(())
     }
 
@@ -58,7 +58,7 @@ impl XEREncodeable for i32 {
 impl<T: XEREncodeable> XEREncodeable for Vec<T> {
     fn xer_encode_content<W: Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
         for item in self.iter() {
-            try!(item.xer_encode(stream));
+            item.xer_encode(stream)?;
         }
         Ok(())
     }
@@ -75,13 +75,13 @@ macro_rules! implement_xer {
         impl $crate::xer::XEREncodeable for $struct_name {
             fn xer_encode_content<W: ::std::io::Write>(&self, stream: &mut W) -> ::std::io::Result<()> {
                 $(
-                    try!(stream.write(b"<"));
-                    try!(stream.write(stringify!($field_name).to_string().as_bytes()));
-                    try!(stream.write(b">"));
-                    try!(self.$field_name.xer_encode_content(stream));
-                    try!(stream.write(b"</"));
-                    try!(stream.write(stringify!($field_name).to_string().as_bytes()));
-                    try!(stream.write(b">"));
+                    stream.write(b"<")?;
+                    stream.write(stringify!($field_name).to_string().as_bytes())?;
+                    stream.write(b">")?;
+                    self.$field_name.xer_encode_content(stream)?;
+                    stream.write(b"</")?;
+                    stream.write(stringify!($field_name).to_string().as_bytes())?;
+                    stream.write(b">")?;
                 )+
                 Ok(())
             }
